@@ -22,61 +22,65 @@ typedef struct EventState
 } EventState;
 
 global_variable b8          is_initialized;
-global_variable EventState *state;
+global_variable EventState *event_state;
 
 b8
-event_init(void)
+event_startup(void)
 {
     if (is_initialized)
     {
         return false;
     }
 
-    state = calloc(sizeof(EventState), 1);
+    event_state = calloc(sizeof(EventState), 1);
+    event_state->registered = calloc(sizeof(EventEntry), REGISTERED_MAX);
+    event_state->registered->events
+        = calloc(sizeof(EventRegitered), EVENT_MAX);
 
     is_initialized = true;
     return true;
 }
 
 b8
-event_destroy(void)
+event_shutdown(void)
 {
     return true;
 }
 
 b8
-event_register(u16 code, void *listener, event_fn_on_event on_event)
+event_register(u32 code, void *listener, event_fn_on_event on_event)
 {
     if (!is_initialized)
     {
         return false;
     }
 
-    if (state->registered_count + 1 > REGISTERED_MAX)
+    if (event_state->registered_count + 1 > REGISTERED_MAX)
     {
         return false;
     }
 
-    if (state->registered[code].events == NULL)
+    if (event_state->registered[code].events == NULL)
     {
-        state->registered[code].events = calloc(sizeof(EventRegitered), 1);
-        state->registered_count++;
+        event_state->registered[code].events
+            = calloc(sizeof(EventRegitered), 1);
+        event_state->registered_count++;
     }
 
-    EventRegitered *event = state->registered[code].events
-                            + state->registered[code].events_count;
+    EventRegitered *event = event_state->registered[code].events
+                            + event_state->registered[code].events_count;
     if (event->listener != listener)
     {
         event->listener = listener;
         event->callback = on_event;
-        state->registered[code].events_count++;
+        event_state->registered[code].events_count++;
     }
 
     return true;
 }
 
 b8
-event_unregister(u16 code, void *listener, event_fn_on_event on_event)
+event_unregister(u32 code, void *listener, event_fn_on_event on_event)
 {
     if (!is_initialized)
     {
@@ -87,12 +91,26 @@ event_unregister(u16 code, void *listener, event_fn_on_event on_event)
 }
 
 b8
-event_fire(u16 code, void *sender, EventCtx context)
+event_fire(u32 code, void *sender, CEvent event)
 {
     if (!is_initialized)
     {
         return false;
     }
 
-    return true;
+    if (event_state->registered[code].events == NULL)
+    {
+        return false;
+    }
+
+    for (u64 i = 0; i < event_state->registered_count; i++)
+    {
+        EventRegitered e = event_state->registered[code].events[i];
+        if (e.callback(code, sender, e.listener, event))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }

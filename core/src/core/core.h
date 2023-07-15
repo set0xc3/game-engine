@@ -1,33 +1,34 @@
 #ifndef CORE_H
 #define CORE_H
 
-#include "core/types.h"
+#include "core/base.h"
 
 // Core Interface
 
 API void core_startup(void);
 API void core_shutdown(void);
+API b8   core_poll_event(void);
 API void core_sleep(u32 ms);
 API u64  core_perf_counter(void);
 API u64  core_perf_frequency(void);
 
 // Container Interface
 
-// String
+// CString8
 
-typedef struct String8
+typedef struct CString8
 {
     u8 *str;
     u64 size;
-} String8;
+} CString8;
 
-API String8 str8(const char *c);
-API char   *str8_c(const String8 string);
-API b8      str8_eq(const String8 left, const String8 right);
+API CString8 str8(const char *c);
+API char    *str8_c(const CString8 string);
+API b8       str8_eq(const CString8 left, const CString8 right);
 
-// Vector2F
+// CVector2
 
-typedef union
+typedef union CVector2
 {
     struct
     {
@@ -50,27 +51,27 @@ typedef union
     };
 
     f32 elements[2];
-} V2F;
+} CVector2;
 
-API V2F v2f(f32 x, f32 y);
-API V2F v2f_add(V2F left, V2F right);
-API V2F v2f_addf(V2F left, f32 right);
-API V2F v2f_sub(V2F left, V2F right);
-API V2F v2f_subf(V2F left, f32 right);
-API V2F v2f_mul(V2F left, V2F right);
-API V2F v2f_mulf(V2F left, f32 right);
-API V2F v2f_div(V2F left, V2F right);
-API V2F v2f_divf(V2F left, f32 right);
-API f32 v2f_dot(V2F left, V2F right);
-API b32 v2f_eq(V2F left, V2F right);
-API V2F v2f_norm(V2F v);
-API f32 v2f_sqrt_len(V2F v);
-API f32 v2f_len(V2F v);
-API V2F v2f_lerp(V2F left, V2F right, f32 time);
+API CVector2 v2(f32 x, f32 y);
+API CVector2 v2_add(CVector2 left, CVector2 right);
+API CVector2 v2_addf(CVector2 left, f32 right);
+API CVector2 v2_sub(CVector2 left, CVector2 right);
+API CVector2 v2_subf(CVector2 left, f32 right);
+API CVector2 v2_mul(CVector2 left, CVector2 right);
+API CVector2 v2_mulf(CVector2 left, f32 right);
+API CVector2 v2_div(CVector2 left, CVector2 right);
+API CVector2 v2_divf(CVector2 left, f32 right);
+API f32      v2_dot(CVector2 left, CVector2 right);
+API b32      v2_eq(CVector2 left, CVector2 right);
+API CVector2 v2_norm(CVector2 v);
+API f32      v2_sqrt_len(CVector2 v);
+API f32      v2_len(CVector2 v);
+API CVector2 v2_lerp(CVector2 left, CVector2 right, f32 time);
 
-// Vector3F
+// CVector3
 
-typedef union
+typedef union CVector3
 {
     struct
     {
@@ -89,54 +90,54 @@ typedef union
 
     struct
     {
-        V2F xy;
-        f32 _ignored0;
+        CVector2 xy;
+        f32      _ignored0;
     };
 
     struct
     {
-        f32 _ignored1;
-        V2F yz;
+        f32      _ignored1;
+        CVector2 yz;
     };
 
     struct
     {
-        V2F uv;
-        f32 _ignored2;
+        CVector2 uv;
+        f32      _ignored2;
     };
 
     struct
     {
-        f32 _ignored3;
-        V2F vw;
+        f32      _ignored3;
+        CVector2 vw;
     };
 
     f32 elements[3];
-} V3F;
+} CVector3;
 
-API V3F v3f(f32 x, f32 y, f32 z);
-API V3F v3f_add(V3F left, V3F right);
-API V3F v3f_sub(V3F left, V3F right);
-API V3F v3f_mul(V3F left, V3F right);
-API V3F v3f_mulf(V3F left, f32 right);
-API V3F v3f_div(V3F left, V3F right);
-API V3F v3f_divf(V3F left, f32 right);
-API f32 v3f_dot(V3F left, V3F right);
-API b32 v3f_eq(V3F left, V3F right);
-API V3F v3f_norm(V3F v);
-API f32 v3f_sqrt_len(V3F v);
-API f32 v3f_len(V3F v);
-API V3F v3f_lerp(V3F left, V3F right, f32 time);
+API CVector3 v3(f32 x, f32 y, f32 z);
+API CVector3 v3_add(CVector3 left, CVector3 right);
+API CVector3 v3_sub(CVector3 left, CVector3 right);
+API CVector3 v3_mul(CVector3 left, CVector3 right);
+API CVector3 v3_mulf(CVector3 left, f32 right);
+API CVector3 v3_div(CVector3 left, CVector3 right);
+API CVector3 v3_divf(CVector3 left, f32 right);
+API f32      v3_dot(CVector3 left, CVector3 right);
+API b32      v3_eq(CVector3 left, CVector3 right);
+API CVector3 v3_norm(CVector3 v);
+API f32      v3_sqrt_len(CVector3 v);
+API f32      v3_len(CVector3 v);
+API CVector3 v3_lerp(CVector3 left, CVector3 right, f32 time);
 
-// Vector4F
+// CVector4
 
-typedef union
+typedef union CVector4
 {
     struct
     {
         union
         {
-            V3F xyz;
+            CVector3 xyz;
             struct
             {
                 f32 x, y, z;
@@ -150,7 +151,7 @@ typedef union
     {
         union
         {
-            V3F rgb;
+            CVector3 rgb;
             struct
             {
                 f32 r, g, b;
@@ -162,23 +163,23 @@ typedef union
 
     struct
     {
-        V2F xy;
-        f32 _ignored0;
-        f32 _ignored1;
+        CVector2 xy;
+        f32      _ignored0;
+        f32      _ignored1;
     };
 
     struct
     {
-        f32 _ignored2;
-        V2F yz;
-        f32 _ignored3;
+        f32      _ignored2;
+        CVector2 yz;
+        f32      _ignored3;
     };
 
     struct
     {
-        f32 _ignored4;
-        f32 _ignored5;
-        V2F zw;
+        f32      _ignored4;
+        f32      _ignored5;
+        CVector2 zw;
     };
 
     struct
@@ -194,47 +195,47 @@ typedef union
     };
 
     f32 elements[4];
-} V4F;
+} CVector4;
 
-API V4F v4f(f32 x, f32 y, f32 z, f32 w);
-API V4F v4f_add(V4F left, V4F right);
-API V4F v4f_sub(V4F left, V4F right);
-API V4F v4f_mul(V4F left, V4F right);
-API V4F v4f_mulf(V4F left, f32 right);
-API V4F v4f_div(V4F left, V4F right);
-API V4F v4f_divf(V4F left, f32 right);
-API f32 v4f_dot(V4F left, V4F right);
-API b32 v4f_eq(V4F left, V4F right);
-API V4F v4f_norm(V4F v);
-API f32 v4f_sqrt_len(V4F v);
-API f32 v4f_len(V4F v);
-API V4F v4f_lerp(V4F left, V4F right, f32 time);
+API CVector4 v4(f32 x, f32 y, f32 z, f32 w);
+API CVector4 v4_add(CVector4 left, CVector4 right);
+API CVector4 v4_sub(CVector4 left, CVector4 right);
+API CVector4 v4_mul(CVector4 left, CVector4 right);
+API CVector4 v4_mulf(CVector4 left, f32 right);
+API CVector4 v4_div(CVector4 left, CVector4 right);
+API CVector4 v4_divf(CVector4 left, f32 right);
+API f32      v4_dot(CVector4 left, CVector4 right);
+API b32      v4_eq(CVector4 left, CVector4 right);
+API CVector4 v4_norm(CVector4 v);
+API f32      v4_sqrt_len(CVector4 v);
+API f32      v4_len(CVector4 v);
+API CVector4 v4_lerp(CVector4 left, CVector4 right, f32 time);
 
 // Asset Interface
 
-typedef struct IImage      IImage;
-typedef struct IAssetState IAssetState;
+typedef struct CImage CImage;
+typedef struct CAsset CAsset;
 
 API void    asset_init(void);
 API void    asset_destroy(void);
 API void   *asset_file_rw_data_load(const char *file_path);
-API IImage *asset_image_load(const char *file_path);
-API void    asset_image_unload(IImage *image);
-API void    asset_image_size_get(IImage *image, i16 *width, i16 *height);
+API CImage *asset_image_load(const char *file_path);
+API void    asset_image_unload(CImage *image);
+API void    asset_image_size_get(CImage *image, i16 *width, i16 *height);
 
 // Audio Interface
 
-typedef struct AudioState AudioState;
+typedef struct CAudio CAudio;
 
-API void        audio_init(void);
-API AudioState *audio_load(const char *file_path);
-API void        audio_unload(AudioState *audio_state);
-API void        audio_play(AudioState *audio_state, bool loop);
-API void        audio_stop(AudioState *audio_state);
+API void    audio_init(void);
+API CAudio *audio_load(const char *file_path);
+API void    audio_unload(CAudio *audio_state);
+API void    audio_play(CAudio *audio_state, bool loop);
+API void    audio_stop(CAudio *audio_state);
 
 // Debug Interface
 
-typedef struct DebugState DebugState;
+typedef struct CDebugState CDebugState;
 
 API void debug_profiler_init(void);
 API void debug_profiler_destroy(void);
@@ -254,15 +255,16 @@ void  _debug_profiler_timed_block_end(void *counter_ptr, u64 cycle_count);
 
 // Window Interface
 
-typedef struct WindowState WindowState;
+typedef struct CWindow CWindow;
 
-API WindowState *window_open(const char *title, i32 xpos, i32 ypos, i32 width,
-                             i32 height);
-API void         window_close(WindowState *window);
+API CWindow *window_open(const char *title, i32 xpos, i32 ypos, i32 width,
+                         i32 height);
+API void     window_close(CWindow *window);
+API b8       window_poll_events(void);
 
 // Event Interface
 
-typedef enum EventCode
+typedef enum CEventCode
 {
     EventCode_AppQuit,
     EventCode_KeyPressed,
@@ -272,10 +274,11 @@ typedef enum EventCode
     EventCode_MouseMotion,
     EventCode_MouseWheel,
     EventCode_WindowResized,
+    EventCode_WindowClosed,
     EventCode_Count,
-} EventCode;
+} CEventCode;
 
-typedef struct EventCtx
+typedef struct CEvent
 {
     // 128 bites
     union
@@ -296,28 +299,28 @@ typedef struct EventCtx
 
         char c[16];
     } data;
-} EventCtx;
+} CEvent;
 
-typedef b8 (*event_fn_on_event)(u16 code, void *sender, void *listener_fn,
-                                EventCtx data);
+typedef b8 (*event_fn_on_event)(u32 code, void *sender, void *listener_fn,
+                                CEvent event);
 
-API b8 event_init(void);
-API b8 event_destroy(void);
-API b8 event_register(u16 code, void *listener, event_fn_on_event on_event);
-API b8 event_unregister(u16 code, void *listener, event_fn_on_event on_event);
-API b8 event_fire(u16 code, void *sender, EventCtx context);
+API b8 event_startup(void);
+API b8 event_shutdown(void);
+API b8 event_register(u32 code, void *listener, event_fn_on_event on_event);
+API b8 event_unregister(u32 code, void *listener, event_fn_on_event on_event);
+API b8 event_fire(u32 code, void *sender, CEvent event);
 
 // Input Interface
 
-typedef enum MouseButton
+typedef enum CMouseButton
 {
     MouseButton_Left,
     MouseButton_Middle,
     MouseButton_Right,
     MouseButton_Count,
-} MouseButton;
+} CMouseButton;
 
-typedef enum KeyCode
+typedef enum CKeyCode
 {
     KeyCode_A,
     KeyCode_D,
@@ -327,53 +330,62 @@ typedef enum KeyCode
     KeyCode_E,
     KeyCode_Escape,
     KeyCode_Count,
-} KeyCode;
+} CKeyCode;
 
-typedef struct KeyboardState
+typedef struct CKeyboardState
 {
     b8 keys[KeyCode_Count];
-} KeyboardState;
+} CKeyboardState;
 
-typedef struct MouseState
+typedef struct CMouseState
 {
-    i16 x, y;
-    i16 wheel;
+    i32 x, y;
+    i32 wheel;
     b8  buttons[MouseButton_Count];
-} MouseState;
+} CMouseState;
 
-typedef struct InputState
+typedef struct CInputState
 {
-    KeyboardState keyboard_current;
-    KeyboardState keyboard_previous;
+    CKeyboardState keyboard_current;
+    CKeyboardState keyboard_previous;
 
-    MouseState mouse_current;
-    MouseState mouse_previous;
-} InputState;
+    CMouseState mouse_current;
+    CMouseState mouse_previous;
+} CInputState;
 
 API void input_startup(void);
 API void input_shutdown(void);
 
-API void input_button_process(MouseButton button, b8 state);
-API void input_key_process(KeyCode key, b8 state);
-API void input_mouse_motion_process(i16 x, i16 y);
-API void input_mouse_scroll_process(i16 z_delta);
+API void input_button_process(u32 button, b8 state);
+API void input_key_process(u32 key, b8 state);
+API void input_mouse_motion_process(i32 x, i32 y);
+API void input_mouse_scroll_process(i32 delta);
 
 API void input_update(void);
-API b32  input_button_pressed(i16 button);
-API b32  input_button_down(i16 button);
-API b32  input_button_up(i16 button);
-API b32  input_key_pressed(i16 key);
-API b32  input_key_down(i16 key);
-API b32  input_key_up(i16 key);
-API void input_mouse_position_get(i16 *x, i16 *y);
-API void input_mouse_wheel_get(i16 *z_delta);
+API b8   input_button_pressed(u32 button);
+API b8   input_button_down(u32 button);
+API b8   input_button_up(u32 button);
+API b8   input_key_pressed(u32 key);
+API b8   input_key_down(u32 key);
+API b8   input_key_up(u32 key);
+API void input_mouse_position_get(i32 *x, i32 *y);
+API void input_mouse_wheel_get(i32 *delta);
+
+// Layer Interface
+
+typedef struct CLayer
+{
+    void (*startup)(void);
+    void (*update)(f32 dt);
+    void (*shutdown)(void);
+} CLayer;
 
 // Library Interface
 
-typedef struct Library Library;
+typedef struct CLibrary CLibrary;
 
-API Library *library_load(char *path);
-API Library *library_unload(Library *lib);
+API CLibrary *library_load(char *path);
+API CLibrary *library_unload(CLibrary *lib);
 
 // Logger Interface
 
@@ -405,19 +417,19 @@ API f64 m_degrees(f64 radian);
 
 // Memory Interface
 
-typedef struct MemoryArena     MemoryArena;
-typedef struct MemoryArenaTemp MemoryArenaTemp;
+typedef struct CMemoryArena     CMemoryArena;
+typedef struct CMemoryArenaTemp CMemoryArenaTemp;
 
-API MemoryArena *arena_create(u64 size);
-API void         arena_destroy(MemoryArena *arena);
-API void        *arena_push(MemoryArena *arena, u64 size);
-API void        *arena_push_zero(MemoryArena *arena, u64 size);
-API void        *arena_pop(MemoryArena *arena, u64 size);
-API void         arena_clear(MemoryArena *arena);
-API u64          arena_offset_get(MemoryArena *arena);
+API CMemoryArena *arena_create(u64 size);
+API void          arena_destroy(CMemoryArena *arena);
+API void         *arena_push(CMemoryArena *arena, u64 size);
+API void         *arena_push_zero(CMemoryArena *arena, u64 size);
+API void         *arena_pop(CMemoryArena *arena, u64 size);
+API void          arena_clear(CMemoryArena *arena);
+API u64           arena_offset_get(CMemoryArena *arena);
 
-API MemoryArenaTemp arena_temp_begin(MemoryArena *arena);
-API void            arena_temp_end(MemoryArenaTemp temp);
-API MemoryArenaTemp arena_temp_scratch_get(MemoryArena *arena);
+API CMemoryArenaTemp arena_temp_begin(CMemoryArena *arena);
+API void             arena_temp_end(CMemoryArenaTemp temp);
+API CMemoryArenaTemp arena_temp_scratch_get(CMemoryArena *arena);
 
 #endif // CORE_H

@@ -2,10 +2,10 @@
 
 #include <math.h>
 
-V4F
-v4f(f32 x, f32 y, f32 z, f32 w)
+CVector4
+v4(f32 x, f32 y, f32 z, f32 w)
 {
-    V4F v;
+    CVector4 v;
     v.x = x;
     v.y = y;
     v.z = z;
@@ -13,10 +13,10 @@ v4f(f32 x, f32 y, f32 z, f32 w)
     return v;
 }
 
-V4F
-v4f_add(V4F left, V4F right)
+CVector4
+v4_add(CVector4 left, CVector4 right)
 {
-    V4F v;
+    CVector4 v;
     v.x = left.x + right.x;
     v.y = left.y + right.y;
     v.z = left.z + right.z;
@@ -24,10 +24,10 @@ v4f_add(V4F left, V4F right)
     return v;
 }
 
-V4F
-v4f_sub(V4F left, V4F right)
+CVector4
+v4_sub(CVector4 left, CVector4 right)
 {
-    V4F v;
+    CVector4 v;
     v.x = left.x - right.x;
     v.y = left.y - right.y;
     v.z = left.z - right.z;
@@ -35,10 +35,10 @@ v4f_sub(V4F left, V4F right)
     return v;
 }
 
-V4F
-v4f_mul(V4F left, V4F right)
+CVector4
+v4_mul(CVector4 left, CVector4 right)
 {
-    V4F v;
+    CVector4 v;
     v.x = left.x * right.x;
     v.y = left.y * right.y;
     v.z = left.z * right.z;
@@ -46,10 +46,10 @@ v4f_mul(V4F left, V4F right)
     return v;
 }
 
-V4F
-v4f_mulf(V4F left, f32 right)
+CVector4
+v4_mulf(CVector4 left, f32 right)
 {
-    V4F v;
+    CVector4 v;
     v.x = left.x * right;
     v.y = left.y * right;
     v.z = left.z * right;
@@ -57,10 +57,10 @@ v4f_mulf(V4F left, f32 right)
     return v;
 }
 
-V4F
-v4f_div(V4F left, V4F right)
+CVector4
+v4_div(CVector4 left, CVector4 right)
 {
-    V4F v;
+    CVector4 v;
     v.x = left.x / right.x;
     v.y = left.y / right.y;
     v.z = left.z / right.z;
@@ -68,10 +68,10 @@ v4f_div(V4F left, V4F right)
     return v;
 }
 
-V4F
-v4f_divf(V4F left, f32 right)
+CVector4
+v4_divf(CVector4 left, f32 right)
 {
-    V4F v;
+    CVector4 v;
     v.x = left.x / right;
     v.y = left.y / right;
     v.z = left.z / right;
@@ -80,39 +80,39 @@ v4f_divf(V4F left, f32 right)
 }
 
 f32
-v4f_dot(V4F left, V4F right)
+v4_dot(CVector4 left, CVector4 right)
 {
     return (left.x * right.x) + (left.y * right.y) + (left.z * right.z)
            + (left.w * right.w);
 }
 
 b32
-v4f_eq(V4F left, V4F right)
+v4_eq(CVector4 left, CVector4 right)
 {
     return left.x == right.x && left.y == right.y && left.z == right.z
            && left.w == right.w;
 }
 
-V4F
-v4f_norm(V4F v)
+CVector4
+v4_norm(CVector4 v)
 {
-    return v4f_mulf(v, 1.0f / sqrtf(v4f_dot(v, v)));
+    return v4_mulf(v, 1.0f / sqrtf(v4_dot(v, v)));
 }
 
 f32
-v4f_sqrt_len(V4F v)
+v4_sqrt_len(CVector4 v)
 {
-    return v4f_dot(v, v);
+    return v4_dot(v, v);
 }
 
 f32
-v4f_len(V4F v)
+v4_len(CVector4 v)
 {
-    return sqrtf(v4f_sqrt_len(v));
+    return sqrtf(v4_sqrt_len(v));
 }
 
-V4F
-v4f_lerp(V4F left, V4F right, f32 time)
+CVector4
+v4_lerp(CVector4 left, CVector4 right, f32 time)
 {
-    return v4f_add(v4f_mulf(left, 1.0f - time), v4f_mulf(right, time));
+    return v4_add(v4_mulf(left, 1.0f - time), v4_mulf(right, time));
 }

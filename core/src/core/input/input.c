@@ -1,129 +1,141 @@
 #include "core/core.h"
 
-global_variable InputState *this;
+global_variable CInputState *input_state;
 
 void
 input_startup()
 {
-    if (this != NULL)
+    if (input_state != NULL)
     {
         return;
     }
 
-    this = calloc(sizeof(InputState), 1);
+    input_state = calloc(sizeof(CInputState), 1);
 }
 
 void
 input_shutdown(void)
 {
-    free(this);
+    free(input_state);
 }
 
 void
-input_button_process(MouseButton button, b8 state)
+input_button_process(u32 button, b8 state)
 {
-    this->mouse_current.buttons[button] = state;
+    log_info("button: %i, %i\n", button, state);
 
-    EventCtx ctx = { 0 };
-    ctx.data.u16[0] = button;
-    event_fire(state ? EventCode_ButtonPressed : EventCode_ButtonReleased, 0,
-               ctx);
+    input_state->mouse_current.buttons[button] = state;
+
+    CEvent event = { 0 };
+    event.data.u32[0] = button;
+    event_fire(state ? EventCode_ButtonPressed : EventCode_ButtonReleased,
+               NULL, event);
 }
 
 void
-input_key_process(KeyCode key, b8 state)
+input_key_process(u32 key, b8 state)
 {
-    this->keyboard_current.keys[key] = state;
+    if (input_state->keyboard_current.keys[key] != state)
+    {
+        log_info("key: %i, %i\n", key, state);
 
-    EventCtx ctx = { 0 };
-    ctx.data.u16[0] = key;
-    event_fire(state ? EventCode_KeyPressed : EventCode_KeyReleased, 0, ctx);
+        input_state->keyboard_current.keys[key] = state;
+
+        CEvent ctx = { 0 };
+        ctx.data.u32[0] = key;
+        event_fire(state ? EventCode_KeyPressed : EventCode_KeyReleased, NULL,
+                   ctx);
+    }
 }
 
 void
-input_mouse_motion_process(i16 x, i16 y)
+input_mouse_motion_process(i32 x, i32 y)
 {
-    this->mouse_current.x = x;
-    this->mouse_current.y = y;
+    log_info("mouse.position: (%i, %i)\n", x, y);
 
-    EventCtx ctx = { 0 };
-    ctx.data.u16[0] = x;
-    ctx.data.u16[1] = y;
-    event_fire(EventCode_MouseMotion, 0, ctx);
+    input_state->mouse_current.x = x;
+    input_state->mouse_current.y = y;
+
+    CEvent event = { 0 };
+    event.data.u32[0] = x;
+    event.data.u32[1] = y;
+    event_fire(EventCode_MouseMotion, NULL, event);
 }
 
 void
-input_mouse_scroll_process(i16 z_delta)
+input_mouse_scroll_process(i32 delta)
 {
-    this->mouse_current.wheel = z_delta;
+    log_info("mouse.scroll: (%i)\n", delta);
 
-    EventCtx ctx = { 0 };
-    ctx.data.u16[0] = z_delta;
-    event_fire(EventCode_MouseWheel, 0, ctx);
+    input_state->mouse_current.wheel = delta;
+
+    CEvent event = { 0 };
+    event.data.u32[0] = delta;
+    event_fire(EventCode_MouseWheel, NULL, event);
 }
 
 void
 input_update(void)
 {
-    memcpy(this->keyboard_previous.keys, this->keyboard_current.keys,
-           sizeof(KeyboardState));
-    memcpy(this->mouse_previous.buttons, this->mouse_current.buttons,
-           sizeof(MouseState));
+    memcpy(input_state->keyboard_previous.keys,
+           input_state->keyboard_current.keys, sizeof(CKeyboardState));
+    memcpy(input_state->mouse_previous.buttons,
+           input_state->mouse_current.buttons, sizeof(CMouseState));
 
-    this->mouse_current.wheel = 0;
+    input_state->mouse_current.wheel = 0;
 }
 
-b32
-input_button_pressed(i16 button)
+b8
+input_button_pressed(u32 button)
 {
-    return this->mouse_previous.buttons[button]
-           && this->mouse_current.buttons[button];
+    return input_state->mouse_previous.buttons[button]
+           && input_state->mouse_current.buttons[button];
 }
 
-b32
-input_button_down(i16 button)
+b8
+input_button_down(u32 button)
 {
-    return !this->mouse_previous.buttons[button]
-           && this->mouse_current.buttons[button];
+    return !input_state->mouse_previous.buttons[button]
+           && input_state->mouse_current.buttons[button];
 }
 
-b32
-input_button_up(i16 button)
+b8
+input_button_up(u32 button)
 {
-    return this->mouse_previous.buttons[button]
-           && !this->mouse_current.buttons[button];
+    return input_state->mouse_previous.buttons[button]
+           && !input_state->mouse_current.buttons[button];
 }
 
-b32
-input_key_pressed(i16 key)
+b8
+input_key_pressed(u32 key)
 {
-    return this->keyboard_previous.keys[key]
-           && this->keyboard_current.keys[key];
+    return input_state->keyboard_previous.keys[key]
+           && input_state->keyboard_current.keys[key];
 }
 
-b32
-input_key_down(i16 key)
+b8
+input_key_down(u32 key)
 {
-    return !this->keyboard_previous.keys[key]
-           && this->keyboard_current.keys[key];
+    return !input_state->keyboard_previous.keys[key]
+           && input_state->keyboard_current.keys[key];
 }
 
-b32
-input_key_up(i16 key)
+b8
+input_key_up(u32 key)
 {
-    return this->keyboard_previous.keys[key]
-           && !this->keyboard_current.keys[key];
-}
-
-void
-input_mouse_position_get(i16 *x, i16 *y)
-{
-    *x = this->mouse_current.x;
-    *y = this->mouse_current.y;
+    return input_state->keyboard_previous.keys[key]
+           && !input_state->keyboard_current.keys[key];
 }
 
 void
-input_mouse_wheel_get(i16 *z_delta)
+input_mouse_position_get(i32 *x, i32 *y)
 {
-    *z_delta = this->mouse_current.wheel;
+    *x = input_state->mouse_current.x;
+    *y = input_state->mouse_current.y;
+}
+
+void
+input_mouse_wheel_get(i32 *delta)
+{
+    *delta = input_state->mouse_current.wheel;
 }

@@ -12,7 +12,7 @@ global_variable const char *audio_ext_list[AUDIO_SUPPORT_COUNT] = {
     [AUDIO_SUPPORT_WAVE] = "wav",
 };
 
-struct AudioState
+struct CAudio
 {
     bool       is_played;
     Mix_Music *music;
@@ -23,7 +23,7 @@ audio_init(void)
 {
 }
 
-AudioState *
+CAudio *
 audio_load(const char *file_path)
 {
 #if 0
@@ -70,7 +70,7 @@ audio_load(const char *file_path)
 }
 
 void
-audio_unload(AudioState *audio_state)
+audio_unload(CAudio *audio_state)
 {
     if (audio_state == NULL)
     {
@@ -83,7 +83,7 @@ audio_unload(AudioState *audio_state)
 }
 
 void
-audio_play(AudioState *audio_state, bool loop)
+audio_play(CAudio *audio_state, bool loop)
 {
     if (audio_state == NULL)
     {
@@ -105,7 +105,7 @@ audio_play(AudioState *audio_state, bool loop)
 }
 
 void
-audio_stop(AudioState *audio_state)
+audio_stop(CAudio *audio_state)
 {
     if (audio_state == NULL)
     {

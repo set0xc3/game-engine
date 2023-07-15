@@ -1,14 +1,7 @@
-void
-startup(void)
-{
-}
+#include <engine/engine.h>
 
 void
-update(void)
+app_layer(CLayer *layer)
 {
-}
-
-void
-shutdown(void)
-{
+    log_info("Layer: game\n");
 }

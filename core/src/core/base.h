@@ -1,5 +1,5 @@
-#ifndef CORE_TYPES_H
-#define CORE_TYPES_H
+#ifndef CORE_BASE_H
+#define CORE_BASE_H
 
 // Base Types
 
@@ -56,20 +56,18 @@ typedef i64 b64;
 #define PLATFORM_SLASH '\\'
 #endif
 
-#define API
-
 #ifdef PLATFORM_LINUX
 #ifdef BUILD_LIB_SHARED
 #define API __attribute__((visibility("default")))
-#elif BUILD_LIB_STATIC
+#else
 #define API
 #endif
 #elif PLATFORM_WINDOWS
 #ifdef BUILD_LIB_SHARED
 #define API __declspec(dllexport)
-#elif BUILD_LIB_STATIC
+#else
 #define API __declspec(dllimport)
 #endif
 #endif
 
-#endif // CORE_TYPES_H
+#endif // CORE_BASE_H

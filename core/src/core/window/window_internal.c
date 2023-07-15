@@ -2,7 +2,7 @@
 
 #include <SDL2/SDL.h>
 
-struct WindowState
+struct CWindow
 {
     SDL_Window   *handle;
     SDL_Renderer *renderer;

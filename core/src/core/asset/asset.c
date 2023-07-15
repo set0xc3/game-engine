@@ -70,7 +70,7 @@ asset_image_load(const char *file_path)
         return result;
     }
 
-    WindowState *window = gfx_window_get();
+    CWindow *window = gfx_window_get();
     result->texture
         = SDL_CreateTextureFromSurface(window->renderer, result->surface);
 

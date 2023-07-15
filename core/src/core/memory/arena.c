@@ -4,23 +4,23 @@
 #include <memory.h>
 #include <stdlib.h>
 
-struct MemoryArena
+struct CMemoryArena
 {
     u8 *data;
     u64 size;
     u64 pos;
 };
 
-struct MemoryArenaTemp
+struct CMemoryArenaTemp
 {
-    MemoryArena *arena;
-    u64          pos;
+    CMemoryArena *arena;
+    u64           pos;
 };
 
-MemoryArena *
+CMemoryArena *
 arena_create(u64 size)
 {
-    MemoryArena *arena = malloc(sizeof(MemoryArena));
+    CMemoryArena *arena = malloc(sizeof(CMemoryArena));
     arena->data = malloc(size);
     arena->size = size;
     arena->pos = 0;
@@ -28,14 +28,14 @@ arena_create(u64 size)
 }
 
 void
-arena_destroy(MemoryArena *arena)
+arena_destroy(CMemoryArena *arena)
 {
     free(arena->data);
     free(arena);
 }
 
 void *
-arena_push(MemoryArena *arena, u64 size)
+arena_push(CMemoryArena *arena, u64 size)
 {
     if (arena->pos + size > arena->size)
     {
@@ -49,7 +49,7 @@ arena_push(MemoryArena *arena, u64 size)
 }
 
 void *
-arena_push_zero(MemoryArena *arena, u64 size)
+arena_push_zero(CMemoryArena *arena, u64 size)
 {
     void *memory = arena_push(arena, size);
     memset(memory, 0, size);
@@ -57,7 +57,7 @@ arena_push_zero(MemoryArena *arena, u64 size)
 }
 
 void *
-arena_pop(MemoryArena *arena, u64 size)
+arena_pop(CMemoryArena *arena, u64 size)
 {
     if (arena->pos == 0)
     {
@@ -71,36 +71,36 @@ arena_pop(MemoryArena *arena, u64 size)
 }
 
 void
-arena_clear(MemoryArena *arena)
+arena_clear(CMemoryArena *arena)
 {
     arena->pos = 0;
 }
 
 u64
-arena_offset_get(MemoryArena *arena)
+arena_offset_get(CMemoryArena *arena)
 {
     return arena->pos;
 }
 
-MemoryArenaTemp
-arena_temp_begin(MemoryArena *arena)
+CMemoryArenaTemp
+arena_temp_begin(CMemoryArena *arena)
 {
-    MemoryArenaTemp result = { 0 };
+    CMemoryArenaTemp result = { 0 };
     result.arena = arena;
     result.pos = arena->pos;
     return result;
 }
 
 void
-arena_temp_end(MemoryArenaTemp temp)
+arena_temp_end(CMemoryArenaTemp temp)
 {
     temp.arena->pos = temp.pos;
 }
 
-MemoryArenaTemp
-arena_temp_scratch_get(MemoryArena *arena)
+CMemoryArenaTemp
+arena_temp_scratch_get(CMemoryArena *arena)
 {
-    MemoryArenaTemp temp = { 0 };
+    CMemoryArenaTemp temp = { 0 };
     temp.arena = arena;
     temp.pos = arena->pos;
     return temp;
