@@ -1,0 +1,23 @@
+cmake_minimum_required(VERSION 3.10)
+project(editor)
+
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+set(TARGET_ARCHITECTURE "x64")
+
+set(PROJECT_SOURCES
+    ${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}/editor.c
+)
+
+add_executable(${PROJECT_NAME}
+    ${PROJECT_SOURCES}
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${PROJECT_SOURCE_DIR}/src
+    ${CORE_SOURCE_DIR}
+)
