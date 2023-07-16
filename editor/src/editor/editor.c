@@ -15,6 +15,22 @@ editor_update(f32 dt)
         first_init = false;
         log_info("  update\n");
     }
+
+    if (input_key_up(KeyCode_Q))
+    {
+        CEvent event = { 0 };
+        event_fire(EventCode_AppQuit, event);
+        log_info("  keycode: q\n");
+    }
+
+    if (input_button_down(MouseButton_Left))
+    {
+        log_info("  mouse.button: left (down)\n");
+    }
+    if (input_button_up(MouseButton_Left))
+    {
+        log_info("  mouse.button: left (up)\n");
+    }
 }
 
 void
