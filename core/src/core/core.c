@@ -19,7 +19,7 @@
 void
 core_startup(void)
 {
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         log_error("SDL could not initialize: %s\n", SDL_GetError());
     }
@@ -34,15 +34,15 @@ core_shutdown(void)
 b8
 core_poll_event(void)
 {
-    CEvent send_event;
-
+    CEvent    send_event = { 0 };
     SDL_Event raw_event = { 0 };
+
     while (SDL_PollEvent(&raw_event))
     {
         switch (raw_event.type)
         {
         case SDL_QUIT:
-            event_fire(EventCode_AppQuit, NULL, send_event);
+            event_fire(EventCode_AppQuit, send_event);
             break;
 
         case SDL_WINDOWEVENT:
@@ -51,10 +51,10 @@ core_poll_event(void)
             {
                 send_event.data.i32[0] = raw_event.window.data1;
                 send_event.data.i32[1] = raw_event.window.data2;
-                event_fire(EventCode_WindowResized, NULL, send_event);
+                event_fire(EventCode_WindowResized, send_event);
             }
-            break;
         }
+        break;
 
         case SDL_MOUSEMOTION:
             input_mouse_motion_process(raw_event.motion.x, raw_event.motion.y);
@@ -68,7 +68,7 @@ core_poll_event(void)
         case SDL_MOUSEBUTTONUP:
         {
             CMouseButton button = MouseButton_Count;
-            b8 state = raw_event.button.state == SDL_PRESSED ? true : false;
+            b8 pressed = raw_event.button.state == SDL_PRESSED ? true : false;
 
             switch (raw_event.button.button)
             {
@@ -85,7 +85,7 @@ core_poll_event(void)
 
             if (button != MouseButton_Count)
             {
-                input_button_process(button, state);
+                input_button_process(button, pressed);
             }
         }
         break;
@@ -94,7 +94,7 @@ core_poll_event(void)
         case SDL_KEYUP:
         {
             CKeyCode key = KeyCode_Count;
-            b8       state = raw_event.key.state == SDL_PRESSED ? true : false;
+            b8 pressed = raw_event.key.state == SDL_PRESSED ? true : false;
 
             switch (raw_event.key.keysym.sym)
             {
@@ -123,12 +123,13 @@ core_poll_event(void)
 
             if (key != KeyCode_Count)
             {
-                input_key_process(key, state);
+                input_key_process(key, pressed);
             }
         }
         break;
         }
     }
+
     return true;
 }
 

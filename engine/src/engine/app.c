@@ -9,14 +9,16 @@ app_startup(void)
     event_startup();
     input_startup();
 
-    event_register(EventCode_AppQuit, NULL, app_on_event);
-    // event_register(EventCode_KeyPressed, NULL, app_on_event);
-    // event_register(EventCode_KeyReleased, NULL, app_on_event);
+    event_register(EventCode_Everything, app_on_event);
 
-    app_state = calloc(sizeof(AppState), 1);
+    app_state = malloc(sizeof(AppState));
+    memset(app_state, 0, sizeof(AppState));
+
     app_state->is_running = true;
     app_state->window = window_open("CWindow", 0, 0, 1280, 720);
-    app_state->layer = calloc(sizeof(CLayer), 1);
+
+    app_state->layer = malloc(sizeof(CLayer));
+    memset(app_state->layer, 0, sizeof(CLayer));
 
     app_layer(app_state->layer);
 
@@ -26,6 +28,8 @@ app_startup(void)
 void
 app_shutdown(void)
 {
+    window_close(app_state->window);
+
     event_shutdown();
     input_shutdown();
     core_shutdown();
@@ -40,11 +44,10 @@ app_update(void)
 
     while (app_state->is_running)
     {
+        input_update();
         core_poll_event();
 
         app_state->layer->update(0.0f);
-
-        input_update();
 
         core_sleep(1);
     }
@@ -53,19 +56,19 @@ app_update(void)
 }
 
 b8
-app_on_event(u32 code, void *sender, void *listener_fn, CEvent event)
+app_on_event(u32 code, CEvent event)
 {
     switch (code)
     {
     case EventCode_AppQuit:
     {
         app_state->is_running = false;
-        break;
     }
+    break;
     case EventCode_KeyPressed:
     {
-        break;
     }
+    break;
     case EventCode_KeyReleased:
     {
         CKeyCode key = event.data.u32[0];
@@ -73,8 +76,8 @@ app_on_event(u32 code, void *sender, void *listener_fn, CEvent event)
         {
             app_state->is_running = false;
         }
-        break;
     }
+    break;
     }
 
     return true;

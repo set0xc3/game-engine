@@ -37,7 +37,7 @@ asset_file_rw_data_load(const char *file_path)
     size = ftell(file);
     rewind(file);
 
-    void *buffer = calloc(size, 1);
+    void *buffer = malloc(size);
     if (buffer == NULL)
     {
         log_error("Failed to allocate memory for buffer\n");
@@ -61,7 +61,7 @@ asset_file_rw_data_load(const char *file_path)
 Image *
 asset_image_load(const char *file_path)
 {
-    Image *result = calloc(sizeof(Image), 1);
+    Image *result = malloc(sizeof(Image));
 
     result->surface = IMG_Load(file_path);
     if (result == NULL)

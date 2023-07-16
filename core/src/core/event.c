@@ -1,24 +1,17 @@
 #include "core/core.h"
 
-#define EVENT_MAX 16384
-#define REGISTERED_MAX 16384
+#define LISTENERS_MAX 256
 
-typedef struct EventRegitered
+typedef struct Listener
 {
-    void             *listener;
-    event_fn_on_event callback;
-} EventRegitered;
-
-typedef struct EventEntry
-{
-    EventRegitered *events;
-    u64             events_count;
-} EventEntry;
+    u32               code;
+    event_on_listener callback;
+} Listener;
 
 typedef struct EventState
 {
-    EventEntry *registered;
-    u64         registered_count;
+    Listener *listeners;
+    u64       listeners_count;
 } EventState;
 
 global_variable b8          is_initialized;
@@ -32,10 +25,11 @@ event_startup(void)
         return false;
     }
 
-    event_state = calloc(sizeof(EventState), 1);
-    event_state->registered = calloc(sizeof(EventEntry), REGISTERED_MAX);
-    event_state->registered->events
-        = calloc(sizeof(EventRegitered), EVENT_MAX);
+    event_state = malloc(sizeof(EventState));
+    memset(event_state, 0, sizeof(EventState));
+
+    event_state->listeners = malloc(LISTENERS_MAX * sizeof(Listener));
+    memset(event_state->listeners, 0, sizeof(Listener));
 
     is_initialized = true;
     return true;
@@ -44,73 +38,78 @@ event_startup(void)
 b8
 event_shutdown(void)
 {
+    free(event_state->listeners);
+    free(event_state);
     return true;
 }
 
 b8
-event_register(u32 code, void *listener, event_fn_on_event on_event)
+event_register(u32 code, event_on_listener on_listener)
 {
-    if (!is_initialized)
+    if (!is_initialized || event_state->listeners_count + 1 > LISTENERS_MAX)
     {
         return false;
     }
 
-    if (event_state->registered_count + 1 > REGISTERED_MAX)
+    for (u64 index = 0; index < event_state->listeners_count; index++)
     {
-        return false;
-    }
-
-    if (event_state->registered[code].events == NULL)
-    {
-        event_state->registered[code].events
-            = calloc(sizeof(EventRegitered), 1);
-        event_state->registered_count++;
-    }
-
-    EventRegitered *event = event_state->registered[code].events
-                            + event_state->registered[code].events_count;
-    if (event->listener != listener)
-    {
-        event->listener = listener;
-        event->callback = on_event;
-        event_state->registered[code].events_count++;
-    }
-
-    return true;
-}
-
-b8
-event_unregister(u32 code, void *listener, event_fn_on_event on_event)
-{
-    if (!is_initialized)
-    {
-        return false;
-    }
-
-    return true;
-}
-
-b8
-event_fire(u32 code, void *sender, CEvent event)
-{
-    if (!is_initialized)
-    {
-        return false;
-    }
-
-    if (event_state->registered[code].events == NULL)
-    {
-        return false;
-    }
-
-    for (u64 i = 0; i < event_state->registered_count; i++)
-    {
-        EventRegitered e = event_state->registered[code].events[i];
-        if (e.callback(code, sender, e.listener, event))
+        Listener *listener = event_state->listeners + index;
+        if (listener->code & code && listener->callback == on_listener)
         {
             return true;
         }
     }
 
-    return false;
+    Listener *listener = event_state->listeners + event_state->listeners_count;
+    listener->code = code;
+    listener->callback = on_listener;
+    event_state->listeners_count++;
+
+    return true;
+}
+
+b8
+event_unregister(u32 code, event_on_listener on_listener)
+{
+    if (!is_initialized)
+    {
+        return false;
+    }
+
+    Listener *top_listener
+        = event_state->listeners + event_state->listeners_count - 1;
+    for (u64 index = 0; index < event_state->listeners_count; index++)
+    {
+        Listener *listener = event_state->listeners + index;
+        if (listener->code & code && listener->callback == on_listener)
+        {
+            listener->code = top_listener->code;
+            listener->callback = top_listener->callback;
+            event_state->listeners_count--;
+
+            break;
+        }
+    }
+
+    return true;
+}
+
+b8
+event_fire(u32 code, CEvent event)
+{
+    if (!is_initialized)
+    {
+        return false;
+    }
+
+    for (u64 index = 0; index < event_state->listeners_count; index++)
+    {
+        Listener *listener = event_state->listeners + index;
+        if (listener->code & code && listener->callback(code, event))
+        {
+            break;
+        }
+    }
+
+    return true;
 }

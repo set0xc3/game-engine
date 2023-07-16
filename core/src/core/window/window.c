@@ -7,7 +7,8 @@
 CWindow *
 window_open(const char *title, i32 xpos, i32 ypos, i32 width, i32 height)
 {
-    CWindow *result = calloc(sizeof(CWindow), 1);
+    CWindow *result = malloc(sizeof(CWindow));
+    memset(result, 0, sizeof(CWindow));
     result->title = title;
     result->rect.x = xpos;
     result->rect.y = ypos;

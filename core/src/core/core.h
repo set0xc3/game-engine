@@ -266,16 +266,17 @@ API b8       window_poll_events(void);
 
 typedef enum CEventCode
 {
-    EventCode_AppQuit,
-    EventCode_KeyPressed,
-    EventCode_KeyReleased,
-    EventCode_ButtonPressed,
-    EventCode_ButtonReleased,
-    EventCode_MouseMotion,
-    EventCode_MouseWheel,
-    EventCode_WindowResized,
-    EventCode_WindowClosed,
-    EventCode_Count,
+    EventCode_AppQuit = 1 << 0,
+    EventCode_KeyPressed = 1 << 1,
+    EventCode_KeyReleased = 1 << 2,
+    EventCode_ButtonPressed = 1 << 3,
+    EventCode_ButtonReleased = 1 << 4,
+    EventCode_MouseMotion = 1 << 5,
+    EventCode_MouseWheel = 1 << 6,
+    EventCode_WindowResized = 1 << 7,
+    EventCode_WindowClosed = 1 << 8,
+    EventCode_Everything = 0xFFFFFFFF,
+    EventCode_Count = 9,
 } CEventCode;
 
 typedef struct CEvent
@@ -301,14 +302,13 @@ typedef struct CEvent
     } data;
 } CEvent;
 
-typedef b8 (*event_fn_on_event)(u32 code, void *sender, void *listener_fn,
-                                CEvent event);
+typedef b8 (*event_on_listener)(u32 code, CEvent event);
 
 API b8 event_startup(void);
 API b8 event_shutdown(void);
-API b8 event_register(u32 code, void *listener, event_fn_on_event on_event);
-API b8 event_unregister(u32 code, void *listener, event_fn_on_event on_event);
-API b8 event_fire(u32 code, void *sender, CEvent event);
+API b8 event_register(u32 code, event_on_listener on_listener);
+API b8 event_unregister(u32 code, event_on_listener on_listener);
+API b8 event_fire(u32 code, CEvent event);
 
 // Input Interface
 
@@ -356,8 +356,8 @@ typedef struct CInputState
 API void input_startup(void);
 API void input_shutdown(void);
 
-API void input_button_process(u32 button, b8 state);
-API void input_key_process(u32 key, b8 state);
+API void input_button_process(u32 button, b8 pressed);
+API void input_key_process(u32 key, b8 pressed);
 API void input_mouse_motion_process(i32 x, i32 y);
 API void input_mouse_scroll_process(i32 delta);
 
