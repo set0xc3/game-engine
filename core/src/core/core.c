@@ -8,6 +8,7 @@
 #include "core/debug/debug.c"
 #include "core/event.c"
 #include "core/input/input.c"
+#include "core/library/library.c"
 #include "core/logger/logger.c"
 #include "core/math/math.c"
 #include "core/memory/arena.c"

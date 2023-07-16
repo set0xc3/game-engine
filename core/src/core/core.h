@@ -371,21 +371,48 @@ API b8   input_key_up(u32 key);
 API void input_mouse_position_get(i32 *x, i32 *y);
 API void input_mouse_wheel_get(i32 *delta);
 
-// Layer Interface
+// Module Interface
 
-typedef struct CLayer
+typedef struct CModuleAPI
 {
     void (*startup)(void);
     void (*update)(f32 dt);
     void (*shutdown)(void);
+} CModuleAPI;
+
+API void
+module_startup_stub(void)
+{
+}
+
+API void
+module_update_stub(f32 dt)
+{
+}
+
+API void
+module_shutdown_stub(void)
+{
+}
+
+// Layer Interface
+
+typedef struct CLayer
+{
+    CModuleAPI api;
 } CLayer;
 
 // Library Interface
 
-typedef struct CLibrary CLibrary;
+typedef struct CLibrary
+{
+    void      *handle;
+    CModuleAPI api;
+} CLibrary;
 
-API CLibrary *library_load(char *path);
-API CLibrary *library_unload(CLibrary *lib);
+API CLibrary *library_load(const char *path);
+API void      library_unload(CLibrary *library);
+API void     *library_load_function(CLibrary *library, const char *name);
 
 // Logger Interface
 

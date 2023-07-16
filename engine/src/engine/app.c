@@ -1,4 +1,4 @@
-#include "engine/engine.h"
+#include "engine/app.h"
 
 global_variable AppState *app_state;
 
@@ -11,29 +11,56 @@ app_startup(void)
 
     event_register(EventCode_Everything, app_on_event);
 
+    // Init app
     app_state = malloc(sizeof(AppState));
     memset(app_state, 0, sizeof(AppState));
 
     app_state->is_running = true;
+
+    // Init window
     app_state->window = window_open("GameEngine", 0, 0, 1280, 720);
 
-    app_state->layer = malloc(sizeof(CLayer));
-    memset(app_state->layer, 0, sizeof(CLayer));
+    // Init layer
+    app_state->layer = malloc(sizeof(CModuleAPI));
+    memset(app_state->layer, 0, sizeof(CModuleAPI));
 
+    app_state->layer->api.startup = module_startup_stub;
+    app_state->layer->api.update = module_update_stub;
+    app_state->layer->api.shutdown = module_shutdown_stub;
     app_layer(app_state->layer);
 
-    app_state->layer->startup();
+    // Init game
+    CLibrary *library = library_load("../lib/libgame");
+    library->api.startup = module_startup_stub;
+    library->api.update = module_update_stub;
+    library->api.shutdown = module_shutdown_stub;
+
+    library->api.startup = library_load_function(library, "startup");
+    library->api.update = library_load_function(library, "update");
+    library->api.shutdown = library_load_function(library, "shutdown");
+    app_state->game = library;
+
+    log_info("library: 0x%X\n", library->handle);
+    log_info("library->game->startup: 0x%X\n", library->api.startup);
+    log_info("library->game->update: 0x%X\n", library->api.update);
+    log_info("library->game->shutdown: 0x%X\n", library->api.shutdown);
+
+    app_state->layer->api.startup();
+    app_state->game->api.startup();
 }
 
 void
 app_shutdown(void)
 {
-    app_state->layer->shutdown();
+    app_state->layer->api.shutdown();
+    app_state->game->api.shutdown();
 }
 
 void
 app_update(void)
 {
+    app_startup();
+
     const f64 fps_max = 60.0;
     const f64 period_max = 1.0 / fps_max;
     const f64 perf_frequency = (f64)core_perf_frequency();
@@ -41,8 +68,6 @@ app_update(void)
     f64 time = 0.0;
     f64 begin_counter = 0.0;
     f64 end_counter = 0.0;
-
-    app_startup();
 
     while (app_state->is_running)
     {
@@ -62,12 +87,14 @@ app_update(void)
             input_update();
             core_poll_event();
 
-            app_state->layer->update(dt);
+            app_state->layer->api.update(dt);
+            app_state->game->api.update(dt);
 
             end_counter = begin_counter;
             time += dt;
 
-            log_info("%.3lf/fps, %.3lf/ms, %.3lf/t\n", fps, dt * 1000.0, time);
+            // log_info("%.3lf/fps, %.3lf/ms, %.3lf/t\n", fps, dt * 1000.0,
+            // time);
         }
 
         core_sleep((u64)period_max);
