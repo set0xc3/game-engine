@@ -1,34 +1,26 @@
 cmake_minimum_required(VERSION 3.10)
 project(engine)
 
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+set(PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}/engine.c)
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
-set(TARGET_ARCHITECTURE "x64")
-
-set(PROJECT_SOURCES
-    ${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}/engine.c
-)
-
-add_executable(${PROJECT_NAME}
-    ${PROJECT_SOURCES}
-)
-
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${PROJECT_SOURCE_DIR}/src
-    ${CORE_SOURCE_DIR}
+target_include_directories(
+    ${PROJECT_NAME}
+    PRIVATE ${PROJECT_SOURCE_DIR}/src ${CORE_SOURCE_DIR}
 )
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    core ${BUILD_TARGET}
-)
+    if(LAYER_TARGET STREQUAL "engine")
+        add_compile_definitions(LAYER_TARGET_NONE)
+        target_link_libraries(${PROJECT_NAME} PRIVATE core)
+    else()
+        target_link_libraries(${PROJECT_NAME} PRIVATE core ${LAYER_TARGET})
+    endif()
 endif()
 
-add_custom_target(run
+add_custom_target(
+    run
     COMMAND cd ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} && ./${PROJECT_NAME} ${ARGS}
 )

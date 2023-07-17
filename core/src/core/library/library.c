@@ -19,6 +19,10 @@ library_load(const char *path)
     strncat((char *)path_ext.str, PLATFORM_LIB_EXT, path_ext.size);
 
     result->handle = SDL_LoadObject((const char *)path_ext.str);
+    if (result->handle == NULL)
+    {
+        log_error("[SDL] %s\n", SDL_GetError());
+    }
 
     return result;
 }

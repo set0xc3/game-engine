@@ -3,12 +3,18 @@
 void
 editor_startup(void)
 {
+    PROFILER_BEGIN(editor_startup);
+
     log_info("Editor: startup\n");
+
+    PROFILER_END(editor_startup);
 }
 
 void
 editor_update(f32 dt)
 {
+    // PROFILER_BEGIN(editor_update);
+
     local_variable b8 first_init = true;
     if (first_init)
     {
@@ -16,12 +22,14 @@ editor_update(f32 dt)
         log_info("Editor: update\n");
     }
 
-#if 0
+#if 1
     if (input_key_up(KeyCode_Q))
     {
-        CEvent event = { 0 };
-        event_fire(EventCode_AppQuit, event);
-        log_info("Editor: keycode: q\n");
+        debug_memory_handle();
+
+        // CEvent event = { 0 };
+        // event_fire(EventCode_AppQuit, event);
+        // log_info("Editor: keycode: q\n");
     }
 
     if (input_button_down(MouseButton_Left))
@@ -33,6 +41,8 @@ editor_update(f32 dt)
         log_info("Editor: mouse.button: left (up)\n");
     }
 #endif
+
+    // PROFILER_END(editor_update);
 }
 
 void

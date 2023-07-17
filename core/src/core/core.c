@@ -1,36 +1,71 @@
 #include "core/core.h"
 
 #include "core/audio/audio.c"
+#include "core/container/hash.c"
 #include "core/container/string8.c"
 #include "core/container/vector2.c"
 #include "core/container/vector3.c"
 #include "core/container/vector4.c"
 #include "core/debug/debug.c"
+#include "core/debug/memory.c"
+#include "core/debug/profiler.c"
 #include "core/event/event.c"
 #include "core/input/input.c"
 #include "core/library/library.c"
 #include "core/logger/logger.c"
 #include "core/math/math.c"
 #include "core/memory/arena.c"
+#include "core/module/module.c"
 #include "core/scene/scene.c"
 #include "core/window/window.c"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_timer.h>
 
+typedef struct CCoreState
+{
+    CWindow *window;
+} CCoreState;
+
+global_variable CCoreState *core_state;
+
 void
 core_startup(void)
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    debug_startup();
+
+    core_state = MemoryAllocStruct(CCoreState);
+    MemoryZeroStruct(core_state, CCoreState);
+
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS) < 0)
     {
         log_error("SDL could not initialize: %s\n", SDL_GetError());
     }
+
+    core_state->window = window_open("GameEngine", 0, 0, 1280, 720);
+
+    event_startup();
+    input_startup();
+}
+
+void
+core_update(void)
+{
+    input_update();
+    core_poll_event();
 }
 
 void
 core_shutdown(void)
 {
+    window_close(core_state->window);
+
+    event_shutdown();
+    input_shutdown();
+
     SDL_Quit();
+
+    MemoryFree(core_state);
 }
 
 b8

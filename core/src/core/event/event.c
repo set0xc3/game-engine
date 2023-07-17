@@ -1,21 +1,21 @@
 #include "core/core.h"
 
-#define LISTENERS_MAX 256
+#define EVENT_LISTENERS_MAX 256
 
-typedef struct Listener
+typedef struct CEventListener
 {
     u32               code;
     event_on_listener callback;
-} Listener;
+} CEventListener;
 
-typedef struct EventState
+typedef struct CEventState
 {
-    Listener *listeners;
-    u64       listeners_count;
-} EventState;
+    CEventListener *listeners;
+    u64             listeners_count;
+} CEventState;
 
-global_variable b8          is_initialized;
-global_variable EventState *event_state;
+global_variable b8           is_initialized;
+global_variable CEventState *event_state;
 
 b8
 event_startup(void)
@@ -25,11 +25,13 @@ event_startup(void)
         return false;
     }
 
-    event_state = MemoryAllocStruct(EventState);
-    MemoryZeroStruct(event_state, EventState);
+    event_state = MemoryAllocStruct(CEventState);
+    MemoryZeroStruct(event_state, CEventState);
 
-    event_state->listeners = MemoryAllocArray(Listener, LISTENERS_MAX);
-    MemoryZeroStruct(event_state->listeners, Listener);
+    event_state->listeners
+        = MemoryAllocArray(CEventListener, EVENT_LISTENERS_MAX);
+    MemoryZeroArray(event_state->listeners, CEventListener,
+                    EVENT_LISTENERS_MAX);
 
     is_initialized = true;
     return true;
@@ -46,21 +48,23 @@ event_shutdown(void)
 b8
 event_register(u32 code, event_on_listener on_listener)
 {
-    if (!is_initialized || event_state->listeners_count + 1 > LISTENERS_MAX)
+    if (!is_initialized
+        || event_state->listeners_count + 1 > EVENT_LISTENERS_MAX)
     {
         return false;
     }
 
     for (u64 index = 0; index < event_state->listeners_count; index++)
     {
-        Listener *listener = event_state->listeners + index;
+        CEventListener *listener = event_state->listeners + index;
         if (listener->code & code && listener->callback == on_listener)
         {
             return true;
         }
     }
 
-    Listener *listener = event_state->listeners + event_state->listeners_count;
+    CEventListener *listener
+        = event_state->listeners + event_state->listeners_count;
     listener->code     = code;
     listener->callback = on_listener;
     event_state->listeners_count++;
@@ -76,11 +80,11 @@ event_unregister(u32 code, event_on_listener on_listener)
         return false;
     }
 
-    Listener *top_listener
+    CEventListener *top_listener
         = event_state->listeners + event_state->listeners_count - 1;
     for (u64 index = 0; index < event_state->listeners_count; index++)
     {
-        Listener *listener = event_state->listeners + index;
+        CEventListener *listener = event_state->listeners + index;
         if (listener->code & code && listener->callback == on_listener)
         {
             listener->code     = top_listener->code;
@@ -104,7 +108,7 @@ event_fire(u32 code, CEvent event)
 
     for (u64 index = 0; index < event_state->listeners_count; index++)
     {
-        Listener *listener = event_state->listeners + index;
+        CEventListener *listener = event_state->listeners + index;
         if (listener->code & code && listener->callback(code, event))
         {
             break;

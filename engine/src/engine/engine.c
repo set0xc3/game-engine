@@ -2,12 +2,12 @@
 
 #include "engine/app.c"
 
-#include <SDL2/SDL.h>
-
 int
 main(int argc, char *argv[])
 {
+    debug_startup();
     app_update();
+    debug_shutdown();
 
     return 0;
 }

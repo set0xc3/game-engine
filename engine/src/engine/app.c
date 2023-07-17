@@ -2,21 +2,23 @@
 
 global_variable AppState *app_state;
 
+#ifdef LAYER_TARGET_NONE
+void
+app_layer(CLayer *layer)
+{
+}
+#endif
+
 void
 app_startup(void)
 {
-    core_startup();
-    event_startup();
-    input_startup();
-
-    event_register(EventCode_Everything, app_on_event);
-
     app_state = MemoryAllocStruct(AppState);
     MemoryZeroStruct(app_state, AppState);
-
     app_state->is_running = true;
 
-    app_state->window = window_open("GameEngine", 0, 0, 1280, 720);
+    core_startup();
+
+    event_register(EventCode_Everything, app_on_event);
 
     app_state->layer = MemoryAllocStruct(CLayer);
     MemoryZeroStruct(app_state->layer, CLayer);
@@ -26,7 +28,7 @@ app_startup(void)
     app_state->layer->api.shutdown = module_shutdown_stub;
     app_layer(app_state->layer);
 
-    CLibrary *library     = library_load("../lib/libgame");
+    CLibrary *library     = library_load("./libgame");
     library->api.startup  = module_startup_stub;
     library->api.update   = module_update_stub;
     library->api.shutdown = module_shutdown_stub;
@@ -45,6 +47,13 @@ app_shutdown(void)
 {
     app_state->layer->api.shutdown();
     app_state->game->api.shutdown();
+
+    library_unload(app_state->game);
+
+    core_shutdown();
+
+    MemoryFree(app_state->layer);
+    MemoryFree(app_state);
 }
 
 void
@@ -75,8 +84,7 @@ app_update(void)
                 dt = period_max;
             }
 
-            input_update();
-            core_poll_event();
+            core_update();
 
             app_state->layer->api.update(dt);
             app_state->game->api.update(dt);

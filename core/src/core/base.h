@@ -3,6 +3,7 @@
 
 // Base Types
 
+#include <assert.h>
 #include <memory.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -57,13 +58,13 @@ typedef i64 b64;
 #endif
 
 #ifdef PLATFORM_LINUX
-#ifdef BUILD_LIB_SHARED
+#ifdef LIBRARY_SHARED
 #define API __attribute__((visibility("default")))
 #else
 #define API
 #endif
 #elif PLATFORM_WINDOWS
-#ifdef BUILD_LIB_SHARED
+#ifdef LIBRARY_SHARED
 #define API __declspec(dllexport)
 #else
 #define API __declspec(dllimport)

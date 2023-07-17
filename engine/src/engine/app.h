@@ -7,11 +7,14 @@ typedef struct AppState
 {
     b8        is_running;
     CLayer   *layer;
-    CWindow  *window;
     CLibrary *game;
 } AppState;
 
+#ifdef LAYER_TARGET_NONE
+internal void app_layer(CLayer *layer);
+#else
 extern void app_layer(CLayer *layer);
+#endif
 
 internal void app_startup(void);
 internal void app_shutdown(void);

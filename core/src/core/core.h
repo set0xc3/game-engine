@@ -6,6 +6,7 @@
 // Core Interface
 
 API void core_startup(void);
+API void core_update(void);
 API void core_shutdown(void);
 API b8   core_poll_event(void);
 API void core_sleep(u32 ms);
@@ -13,6 +14,8 @@ API u64  core_perf_counter(void);
 API u64  core_perf_frequency(void);
 
 // Container Interface
+
+API u64 hash_string_fnv1a64(const char *str);
 
 // CString8
 
@@ -23,8 +26,9 @@ typedef struct CString8
 } CString8;
 
 API CString8 str8(const char *c);
-API char    *str8_c(const CString8 string);
 API b8       str8_eq(const CString8 left, const CString8 right);
+
+#define str8_c(s) (const char *)s.str
 
 // CVector2
 
@@ -237,19 +241,26 @@ API void    audio_stop(CAudio *audio_state);
 
 typedef struct CDebugState CDebugState;
 
-API void debug_profiler_init(void);
-API void debug_profiler_destroy(void);
-API void debug_profiler_handle(void);
+API void debug_startup(void);
+API void debug_shutdown(void);
+API void debug_update(void);
 
-void *_debug_profiler_timed_block_begin(const char *func_name);
-void  _debug_profiler_timed_block_end(void *counter_ptr, u64 cycle_count);
+API void debug_memory_handle(void);
+
+API void *_debug_memory_alloc(u64 size, const char *file_path, u64 line);
+API void  _debug_memory_free(void *memory, const char *file_path, u64 line);
+API void  _debug_memory_zero(void *memory, u64 size, const char *file_path,
+                             u64 line);
+
+API void *_debug_profiler_timed_block_begin(const char *func_name);
+API void  _debug_profiler_timed_block_end(void *counter_ptr, u64 cycle_count);
 
 #define PROFILER_BEGIN(NAME)                                                  \
     void *current_counter_##NAME = _debug_profiler_timed_block_begin(#NAME);  \
-    u64   start_##NAME           = forge_perf_counter();
+    u64   start_##NAME           = core_perf_counter();
 
 #define PROFILER_END(NAME)                                                    \
-    u64 end_##NAME = forge_perf_counter();                                    \
+    u64 end_##NAME = core_perf_counter();                                     \
     _debug_profiler_timed_block_end(current_counter_##NAME,                   \
                                     end_##NAME - start_##NAME);
 
@@ -424,20 +435,9 @@ typedef struct CModuleAPI
     void (*shutdown)(void);
 } CModuleAPI;
 
-API void
-module_startup_stub(void)
-{
-}
-
-API void
-module_update_stub(f32 dt)
-{
-}
-
-API void
-module_shutdown_stub(void)
-{
-}
+API void module_startup_stub(void);
+API void module_update_stub(f32 dt);
+API void module_shutdown_stub(void);
 
 // Layer Interface
 
@@ -461,6 +461,7 @@ API void     *library_load_function(CLibrary *library, const char *name);
 // Logger Interface
 
 API void log_info(const char *format, ...);
+API void log_debug(const char *format, ...);
 API void log_warning(const char *format, ...);
 API void log_error(const char *format, ...);
 
@@ -488,6 +489,17 @@ API f64 m_degrees(f64 radian);
 
 // Memory Interface
 
+#ifndef NDEBUG
+#define MemoryAlloc(type, size)                                               \
+    (type *)_debug_memory_alloc(size * sizeof(type), __FILE__, __LINE__)
+#define MemoryAllocArray(type, size) MemoryAlloc(type, size)
+#define MemoryAllocStruct(type)      MemoryAlloc(type, 1)
+#define MemoryFree(memory)           _debug_memory_free(memory, __FILE__, __LINE__)
+#define MemoryZero(memory, type, size)                                        \
+    _debug_memory_zero(memory, size * sizeof(type), __FILE__, __LINE__)
+#define MemoryZeroArray(memory, type, size) MemoryZero(memory, type, size)
+#define MemoryZeroStruct(memory, type)      MemoryZero(memory, type, 1)
+#else
 #define MemoryAlloc(type, size)             (type *)malloc(size * sizeof(type))
 #define MemoryAllocArray(type, size)        MemoryAlloc(type, size)
 #define MemoryAllocStruct(type)             MemoryAlloc(type, 1)
@@ -495,6 +507,7 @@ API f64 m_degrees(f64 radian);
 #define MemoryZero(memory, type, size)      memset(memory, 0, size * sizeof(type))
 #define MemoryZeroArray(memory, type, size) MemoryZero(memory, type, size)
 #define MemoryZeroStruct(memory, type)      MemoryZero(memory, type, 1)
+#endif
 
 typedef struct CMemoryArena     CMemoryArena;
 typedef struct CMemoryArenaTemp CMemoryArenaTemp;

@@ -25,18 +25,18 @@ window_open(const char *title, i32 xpos, i32 ypos, i32 width, i32 height)
         return NULL;
     }
 
-    result->renderer = SDL_CreateRenderer(result->handle, -1,
-                                          SDL_RENDERER_ACCELERATED
-                                              | SDL_RENDERER_TARGETTEXTURE);
-    if (!result->renderer)
-    {
-        log_error("[SDL] Failed create renderer\n");
-        return NULL;
-    }
+    // result->renderer = SDL_CreateRenderer(result->handle, -1,
+    //                                       SDL_RENDERER_ACCELERATED
+    //                                           | SDL_RENDERER_TARGETTEXTURE);
+    // if (!result->renderer)
+    // {
+    //     log_error("[SDL] Failed create renderer\n");
+    //     return NULL;
+    // }
 
-    result->texture = SDL_CreateTexture(
-        result->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-        result->rect.width, result->rect.height);
+    // result->texture = SDL_CreateTexture(
+    //     result->renderer, SDL_PIXELFORMAT_RGBA8888,
+    //     SDL_TEXTUREACCESS_TARGET, result->rect.width, result->rect.height);
 
     return result;
 }

@@ -2,39 +2,32 @@
 
 #include <stdarg.h>
 
-typedef enum
+typedef enum CLoggerType
 {
-    INFO,
-    WARNING,
-    ERROR
-} Log_Type;
+    LoggerType_Info,
+    LoggerType_Debug,
+    LoggerType_Warning,
+    LoggerType_Error,
+    LoggerType_Count,
+} CLoggerType;
+
+const char *logger_types_string[LoggerType_Count] = {
+    "INFO",
+    "DEBUG",
+    "WARNING",
+    "ERROR",
+};
 
 void
-log_message(Log_Type type, const char *format, va_list args)
+log_message(CLoggerType type, const char *format, va_list args)
 {
-    char       *buffer = NULL;
-    FILE       *stream = NULL;
-    const char *prefix = "";
-    const u32   prefix_width = 4;
+    char       *buffer       = NULL;
+    FILE       *stream       = NULL;
+    const char *prefix       = "";
+    const u32   prefix_width = 8;
 
-    switch (type)
-    {
-    case INFO:
-        stream = stdout;
-        prefix = "INFO:";
-        break;
-    case WARNING:
-        stream = stderr;
-        prefix = "WARNING:";
-        break;
-    case ERROR:
-        stream = stderr;
-        prefix = "ERROR:";
-        break;
-    default:
-        stream = stdout;
-        break;
-    }
+    stream = stdout;
+    prefix = logger_types_string[type];
 
     va_list args_copy;
     va_copy(args_copy, args);
@@ -45,7 +38,7 @@ log_message(Log_Type type, const char *format, va_list args)
     vsnprintf(buffer, buffer_size + 1, format, args);
 
     const u32 padding = prefix_width - (u32)strlen(prefix);
-    fprintf(stream, "%s", prefix);
+    fprintf(stream, " - %s:", prefix);
     fprintf(stream, "%*s %s", padding, "", buffer);
 }
 
@@ -54,7 +47,16 @@ log_info(const char *format, ...)
 {
     va_list args;
     va_start(args, format);
-    log_message(INFO, format, args);
+    log_message(LoggerType_Info, format, args);
+    va_end(args);
+}
+
+void
+log_debug(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    log_message(LoggerType_Debug, format, args);
     va_end(args);
 }
 
@@ -63,7 +65,7 @@ log_warning(const char *format, ...)
 {
     va_list args;
     va_start(args, format);
-    log_message(WARNING, format, args);
+    log_message(LoggerType_Warning, format, args);
     va_end(args);
 }
 
@@ -72,6 +74,6 @@ log_error(const char *format, ...)
 {
     va_list args;
     va_start(args, format);
-    log_message(ERROR, format, args);
+    log_message(LoggerType_Error, format, args);
     va_end(args);
 }

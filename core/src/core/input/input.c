@@ -83,11 +83,10 @@ input_mouse_scroll_process(i32 delta)
 void
 input_update(void)
 {
-    memcpy(input_state->keyboard_previous.keys,
-           input_state->keyboard_current.keys, sizeof(CKeyboardState));
-
-    memcpy(input_state->mouse_previous.buttons,
-           input_state->mouse_current.buttons, sizeof(CMouseState));
+    memcpy(&input_state->keyboard_previous, &input_state->keyboard_current,
+           sizeof(CKeyboardState));
+    memcpy(&input_state->mouse_previous, &input_state->mouse_current,
+           sizeof(CMouseState));
 
     input_state->mouse_current.wheel = 0;
 }
