@@ -25,11 +25,11 @@ event_startup(void)
         return false;
     }
 
-    event_state = malloc(sizeof(EventState));
-    memset(event_state, 0, sizeof(EventState));
+    event_state = MemoryAllocStruct(EventState);
+    MemoryZeroStruct(event_state, EventState);
 
-    event_state->listeners = malloc(LISTENERS_MAX * sizeof(Listener));
-    memset(event_state->listeners, 0, sizeof(Listener));
+    event_state->listeners = MemoryAllocArray(Listener, LISTENERS_MAX);
+    MemoryZeroStruct(event_state->listeners, Listener);
 
     is_initialized = true;
     return true;
@@ -38,8 +38,8 @@ event_startup(void)
 b8
 event_shutdown(void)
 {
-    free(event_state->listeners);
-    free(event_state);
+    MemoryFree(event_state->listeners);
+    MemoryFree(event_state);
     return true;
 }
 
@@ -61,7 +61,7 @@ event_register(u32 code, event_on_listener on_listener)
     }
 
     Listener *listener = event_state->listeners + event_state->listeners_count;
-    listener->code = code;
+    listener->code     = code;
     listener->callback = on_listener;
     event_state->listeners_count++;
 
@@ -83,7 +83,7 @@ event_unregister(u32 code, event_on_listener on_listener)
         Listener *listener = event_state->listeners + index;
         if (listener->code & code && listener->callback == on_listener)
         {
-            listener->code = top_listener->code;
+            listener->code     = top_listener->code;
             listener->callback = top_listener->callback;
             event_state->listeners_count--;
 

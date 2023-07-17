@@ -20,18 +20,18 @@ struct CMemoryArenaTemp
 CMemoryArena *
 arena_create(u64 size)
 {
-    CMemoryArena *arena = malloc(sizeof(CMemoryArena));
-    arena->data = malloc(size);
-    arena->size = size;
-    arena->pos = 0;
+    CMemoryArena *arena = MemoryAllocStruct(CMemoryArena);
+    arena->data         = MemoryAllocArray(u8, size);
+    arena->size         = size;
+    arena->pos          = 0;
     return arena;
 }
 
 void
 arena_destroy(CMemoryArena *arena)
 {
-    free(arena->data);
-    free(arena);
+    MemoryFree(arena->data);
+    MemoryFree(arena);
 }
 
 void *
@@ -86,8 +86,8 @@ CMemoryArenaTemp
 arena_temp_begin(CMemoryArena *arena)
 {
     CMemoryArenaTemp result = { 0 };
-    result.arena = arena;
-    result.pos = arena->pos;
+    result.arena            = arena;
+    result.pos              = arena->pos;
     return result;
 }
 
@@ -101,7 +101,7 @@ CMemoryArenaTemp
 arena_temp_scratch_get(CMemoryArena *arena)
 {
     CMemoryArenaTemp temp = { 0 };
-    temp.arena = arena;
-    temp.pos = arena->pos;
+    temp.arena            = arena;
+    temp.pos              = arena->pos;
     return temp;
 }

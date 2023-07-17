@@ -5,13 +5,13 @@
 CLibrary *
 library_load(const char *path)
 {
-    CLibrary *result = malloc(sizeof(CLibrary));
-    memset(result, 0, sizeof(CLibrary));
+    CLibrary *result = MemoryAllocStruct(CLibrary);
+    MemoryZeroStruct(result, CLibrary);
 
-    char *dot = ".";
+    char *dot      = ".";
     u64   dot_size = strlen(dot);
 
-    u64      size = strlen(path) + strlen(PLATFORM_LIB_EXT) + dot_size;
+    u64      size     = strlen(path) + strlen(PLATFORM_LIB_EXT) + dot_size;
     CString8 path_ext = { (u8 *)alloca(size), size };
     strncpy((char *)path_ext.str, path, path_ext.size);
 
@@ -27,7 +27,7 @@ void
 library_unload(CLibrary *library)
 {
     SDL_UnloadObject(library->handle);
-    free(library);
+    MemoryFree(library);
 }
 
 void *

@@ -63,7 +63,7 @@ API CVector2 v2_mulf(CVector2 left, f32 right);
 API CVector2 v2_div(CVector2 left, CVector2 right);
 API CVector2 v2_divf(CVector2 left, f32 right);
 API f32      v2_dot(CVector2 left, CVector2 right);
-API b32      v2_eq(CVector2 left, CVector2 right);
+API b8       v2_eq(CVector2 left, CVector2 right);
 API CVector2 v2_norm(CVector2 v);
 API f32      v2_sqrt_len(CVector2 v);
 API f32      v2_len(CVector2 v);
@@ -123,7 +123,7 @@ API CVector3 v3_mulf(CVector3 left, f32 right);
 API CVector3 v3_div(CVector3 left, CVector3 right);
 API CVector3 v3_divf(CVector3 left, f32 right);
 API f32      v3_dot(CVector3 left, CVector3 right);
-API b32      v3_eq(CVector3 left, CVector3 right);
+API b8       v3_eq(CVector3 left, CVector3 right);
 API CVector3 v3_norm(CVector3 v);
 API f32      v3_sqrt_len(CVector3 v);
 API f32      v3_len(CVector3 v);
@@ -205,7 +205,7 @@ API CVector4 v4_mulf(CVector4 left, f32 right);
 API CVector4 v4_div(CVector4 left, CVector4 right);
 API CVector4 v4_divf(CVector4 left, f32 right);
 API f32      v4_dot(CVector4 left, CVector4 right);
-API b32      v4_eq(CVector4 left, CVector4 right);
+API b8       v4_eq(CVector4 left, CVector4 right);
 API CVector4 v4_norm(CVector4 v);
 API f32      v4_sqrt_len(CVector4 v);
 API f32      v4_len(CVector4 v);
@@ -246,12 +246,56 @@ void  _debug_profiler_timed_block_end(void *counter_ptr, u64 cycle_count);
 
 #define PROFILER_BEGIN(NAME)                                                  \
     void *current_counter_##NAME = _debug_profiler_timed_block_begin(#NAME);  \
-    u64   start_##NAME = forge_perf_counter();
+    u64   start_##NAME           = forge_perf_counter();
 
 #define PROFILER_END(NAME)                                                    \
     u64 end_##NAME = forge_perf_counter();                                    \
     _debug_profiler_timed_block_end(current_counter_##NAME,                   \
                                     end_##NAME - start_##NAME);
+
+// Entity Interface
+
+typedef u64 CEntityID;
+
+typedef enum CEntityFlags
+{
+    Entity_Active     = 1 << 0,
+    Entity_Renderable = 1 << 1,
+} CEntityFlags;
+
+typedef struct CEntity
+{
+    CEntityID    id;
+    CEntityFlags flags;
+    b8           enabled;
+
+    CVector3 position;
+    CVector4 quaternion;
+    CVector3 scale;
+} CEntity;
+
+// Scene Interface
+
+#define SCENE_ENTITIES_MAX 1000
+
+typedef struct CSceneState
+{
+    char *path;
+    b8    edited;
+    b8    dirtied;
+
+    CEntityID entities_selected[SCENE_ENTITIES_MAX];
+    u64       entities_selected_count;
+    CEntity   entities[SCENE_ENTITIES_MAX];
+    u64       entities_count;
+} CSceneState;
+
+API void scene_startup(void);
+API void scene_update(f32 dt);
+API void scene_shutdown(void);
+
+API void scene_entity_add(CEntity *entity);
+API void scene_entity_remove(CEntity *entity);
 
 // Window Interface
 
@@ -266,17 +310,17 @@ API b8       window_poll_events(void);
 
 typedef enum CEventCode
 {
-    EventCode_AppQuit = 1 << 0,
-    EventCode_KeyPressed = 1 << 1,
-    EventCode_KeyReleased = 1 << 2,
-    EventCode_ButtonPressed = 1 << 3,
+    EventCode_AppQuit        = 1 << 0,
+    EventCode_KeyPressed     = 1 << 1,
+    EventCode_KeyReleased    = 1 << 2,
+    EventCode_ButtonPressed  = 1 << 3,
     EventCode_ButtonReleased = 1 << 4,
-    EventCode_MouseMotion = 1 << 5,
-    EventCode_MouseWheel = 1 << 6,
-    EventCode_WindowResized = 1 << 7,
-    EventCode_WindowClosed = 1 << 8,
-    EventCode_Everything = 0xFFFFFFFF,
-    EventCode_Count = 9,
+    EventCode_MouseMotion    = 1 << 5,
+    EventCode_MouseWheel     = 1 << 6,
+    EventCode_WindowResized  = 1 << 7,
+    EventCode_WindowClosed   = 1 << 8,
+    EventCode_Everything     = 0xFFFFFFFF,
+    EventCode_Count          = 9,
 } CEventCode;
 
 typedef struct CEvent
@@ -422,20 +466,20 @@ API void log_error(const char *format, ...);
 
 // Math Interface
 
-#define COLOR_RED v4f(1.0f, 0.0f, 0.0f, 1.0f)
-#define COLOR_RED_DARK v4f(0.5f, 0.0f, 0.0f, 1.0f)
-#define COLOR_GREEN v4f(0.0f, 1.0f, 0.0f, 1.0f)
-#define COLOR_GREEN_DARK v4f(0.0f, 0.5f, 0.0f, 1.0f)
-#define COLOR_BLUE v4f(0.0f, 0.0f, 1.0f, 1.0f)
-#define COLOR_BLUE_DARK v4f(0.0f, 0.0f, 0.5f, 1.0f)
-#define COLOR_PINK v4f(1.0f, 0.0f, 1.0f, 1.0f)
-#define COLOR_PINK_DARK v4f(0.5f, 0.0f, 0.5f, 1.0f)
-#define COLOR_YELLOW v4f(1.0f, 1.0f, 0.0f, 1.0f)
-#define COLOR_YELLOW_DARK v4f(0.5f, 0.5f, 0.0f, 1.0f)
-#define COLOR_CYAN v4f(0.0f, 1.0f, 1.0f, 1.0f)
-#define COLOR_CYAN_DARK v4f(0.0f, 0.5f, 0.5f, 1.0f)
-#define COLOR_WHITE v4f(1.0f, 1.0f, 1.0f, 1.0f)
-#define COLOR_BLACK v4f(0.0f, 0.0f, 0.0f, 1.0f)
+#define COLOR_RED         v4(1.0f, 0.0f, 0.0f, 1.0f)
+#define COLOR_RED_DARK    v4(0.5f, 0.0f, 0.0f, 1.0f)
+#define COLOR_GREEN       v4(0.0f, 1.0f, 0.0f, 1.0f)
+#define COLOR_GREEN_DARK  v4(0.0f, 0.5f, 0.0f, 1.0f)
+#define COLOR_BLUE        v4(0.0f, 0.0f, 1.0f, 1.0f)
+#define COLOR_BLUE_DARK   v4(0.0f, 0.0f, 0.5f, 1.0f)
+#define COLOR_PINK        v4(1.0f, 0.0f, 1.0f, 1.0f)
+#define COLOR_PINK_DARK   v4(0.5f, 0.0f, 0.5f, 1.0f)
+#define COLOR_YELLOW      v4(1.0f, 1.0f, 0.0f, 1.0f)
+#define COLOR_YELLOW_DARK v4(0.5f, 0.5f, 0.0f, 1.0f)
+#define COLOR_CYAN        v4(0.0f, 1.0f, 1.0f, 1.0f)
+#define COLOR_CYAN_DARK   v4(0.0f, 0.5f, 0.5f, 1.0f)
+#define COLOR_WHITE       v4(1.0f, 1.0f, 1.0f, 1.0f)
+#define COLOR_BLACK       v4(0.0f, 0.0f, 0.0f, 1.0f)
 
 API f32 m_radiansf(f32 degree);
 API f32 m_degreesf(f32 radian);
@@ -443,6 +487,14 @@ API f64 m_radians(f64 degree);
 API f64 m_degrees(f64 radian);
 
 // Memory Interface
+
+#define MemoryAlloc(type, size)             (type *)malloc(size * sizeof(type))
+#define MemoryAllocArray(type, size)        MemoryAlloc(type, size)
+#define MemoryAllocStruct(type)             MemoryAlloc(type, 1)
+#define MemoryFree(memory)                  free(memory)
+#define MemoryZero(memory, type, size)      memset(memory, 0, size * sizeof(type))
+#define MemoryZeroArray(memory, type, size) MemoryZero(memory, type, size)
+#define MemoryZeroStruct(memory, type)      MemoryZero(memory, type, 1)
 
 typedef struct CMemoryArena     CMemoryArena;
 typedef struct CMemoryArenaTemp CMemoryArenaTemp;
@@ -458,5 +510,15 @@ API u64           arena_offset_get(CMemoryArena *arena);
 API CMemoryArenaTemp arena_temp_begin(CMemoryArena *arena);
 API void             arena_temp_end(CMemoryArenaTemp temp);
 API CMemoryArenaTemp arena_temp_scratch_get(CMemoryArena *arena);
+
+#define PushArray(arena, type, count)                                         \
+    (type *)arena_push(arena, count * sizeof(type))
+#define PushArrayZero(arena, type, count)                                     \
+    (type *)arena_push_zero(arena, count * sizeof(type))
+#define PushStruct(arena, type)     PushArray(arena, 1)
+#define PushStructZero(arena, type) PushArrayZero(arena, 1)
+#define PopArray(arena, type, count)                                          \
+    (type *)arena_pop(arena, count * sizeof(type))
+#define PopStruct(arena, type) PopArray(arena, 1)
 
 #endif // CORE_H

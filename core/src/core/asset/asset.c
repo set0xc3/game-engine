@@ -37,7 +37,7 @@ asset_file_rw_data_load(const char *file_path)
     size = ftell(file);
     rewind(file);
 
-    void *buffer = malloc(size);
+    void *buffer = MemoryAllocArray(void *, size);
     if (buffer == NULL)
     {
         log_error("Failed to allocate memory for buffer\n");
@@ -49,7 +49,7 @@ asset_file_rw_data_load(const char *file_path)
     if (result != size)
     {
         log_error("Failed to read file: %s\n", file_path);
-        free(buffer);
+        MemoryFree(buffer);
         fclose(file);
         return NULL;
     }
@@ -61,7 +61,7 @@ asset_file_rw_data_load(const char *file_path)
 Image *
 asset_image_load(const char *file_path)
 {
-    Image *result = malloc(sizeof(Image));
+    Image *result = MemoryAllocStruct(Image);
 
     result->surface = IMG_Load(file_path);
     if (result == NULL)
@@ -86,6 +86,6 @@ asset_image_unload(Image *image)
 void
 asset_image_size_get(Image *image, i16 *width, i16 *height)
 {
-    *width = image->surface->w;
+    *width  = image->surface->w;
     *height = image->surface->h;
 }

@@ -78,7 +78,7 @@ v3_dot(CVector3 left, CVector3 right)
     return (left.x * right.x) + (left.y * right.y) + (left.z * right.z);
 }
 
-b32
+b8
 v3_eq(CVector3 left, CVector3 right)
 {
     return left.x == right.x && left.y == right.y && left.z == right.z;

@@ -44,7 +44,7 @@ editor_shutdown(void)
 void
 app_layer(CLayer *layer)
 {
-    layer->api.startup = editor_startup;
-    layer->api.update = editor_update;
+    layer->api.startup  = editor_startup;
+    layer->api.update   = editor_update;
     layer->api.shutdown = editor_shutdown;
 }

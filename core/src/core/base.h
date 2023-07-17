@@ -28,11 +28,11 @@ typedef i16 b16;
 typedef i32 b32;
 typedef i64 b64;
 
-#define local_variable static
+#define local_variable  static
 #define global_variable static
-#define internal static
+#define internal        static
 
-#define Bytes(value) (value)
+#define Bytes(value)     (value)
 #define Kilobytes(value) (value << 10)
 #define Megabytes(value) (value << 20)
 #define Gigabytes(value) ((u64)(value) << 30)
@@ -50,10 +50,10 @@ typedef i64 b64;
 
 #ifdef PLATFORM_LINUX
 #define PLATFORM_LIB_EXT "so"
-#define PLATFORM_SLASH '/'
+#define PLATFORM_SLASH   '/'
 #elif PLATFORM_WINDOWS
 #define PLATFORM_LIB_EXT "dll"
-#define PLATFORM_SLASH '\\'
+#define PLATFORM_SLASH   '\\'
 #endif
 
 #ifdef PLATFORM_LINUX

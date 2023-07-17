@@ -89,7 +89,7 @@ v2_dot(CVector2 left, CVector2 right)
     return (left.x * right.x) + (left.y * right.y);
 }
 
-b32
+b8
 v2_eq(CVector2 left, CVector2 right)
 {
     return left.x == right.x && left.y == right.y;

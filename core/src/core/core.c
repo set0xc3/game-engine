@@ -6,12 +6,13 @@
 #include "core/container/vector3.c"
 #include "core/container/vector4.c"
 #include "core/debug/debug.c"
-#include "core/event.c"
+#include "core/event/event.c"
 #include "core/input/input.c"
 #include "core/library/library.c"
 #include "core/logger/logger.c"
 #include "core/math/math.c"
 #include "core/memory/arena.c"
+#include "core/scene/scene.c"
 #include "core/window/window.c"
 
 #include <SDL2/SDL.h>
@@ -36,7 +37,7 @@ b8
 core_poll_event(void)
 {
     CEvent    send_event = { 0 };
-    SDL_Event raw_event = { 0 };
+    SDL_Event raw_event  = { 0 };
 
     while (SDL_PollEvent(&raw_event))
     {
@@ -95,7 +96,7 @@ core_poll_event(void)
         case SDL_KEYUP:
         {
             CKeyCode key = KeyCode_Count;
-            b8 pressed = raw_event.key.state == SDL_PRESSED ? true : false;
+            b8 pressed   = raw_event.key.state == SDL_PRESSED ? true : false;
 
             switch (raw_event.key.keysym.sym)
             {

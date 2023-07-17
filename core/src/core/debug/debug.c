@@ -29,17 +29,16 @@ u64                debug_string_to_hash(const char *str);
 void
 debug_profiler_init(void)
 {
-    debug_state = (CDebugState *)malloc(sizeof(CDebugState));
-    debug_state->counter_table
-        = (DebugCounterTable *)malloc(sizeof(DebugCounterTable));
-    memset(debug_state->counter_table, 0, sizeof(DebugCounterTable));
+    debug_state                = MemoryAllocStruct(CDebugState);
+    debug_state->counter_table = MemoryAllocStruct(DebugCounterTable);
+    MemoryZeroStruct(debug_state->counter_table, DebugCounterTable);
 }
 
 void
 debug_profiler_destroy(void)
 {
-    free(debug_state->counter_table);
-    free(debug_state);
+    MemoryFree(debug_state->counter_table);
+    MemoryFree(debug_state);
 }
 
 void
@@ -64,7 +63,7 @@ debug_profiler_handle(void)
                      counter->cycle_count / counter->hit_count,
                      dt * 1000000.0f, dt_cyh * 1000000.0f);
 #endif
-            counter->hit_count = 0;
+            counter->hit_count   = 0;
             counter->cycle_count = 0;
         }
     }

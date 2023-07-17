@@ -27,7 +27,7 @@ CAudio *
 audio_load(const char *file_path)
 {
 #if 0
-    AudioState *result = malloc(sizeof(AudioState));
+    AudioState *result = MemoryAllocStruct(AudioState);
     memset(result, 0, sizeof(AudioState));
 
     String8 *file_ext = str8_alloc(str8(file_path));
@@ -53,7 +53,7 @@ audio_load(const char *file_path)
         result->music = Mix_LoadMUS(file_path);
         if (result->music == NULL)
         {
-            free(result);
+            MemoryFree(result);
             result = NULL;
             log_error("Failed Mix_LoadMUS: %s\n", Mix_GetError());
         }
@@ -79,7 +79,7 @@ audio_unload(CAudio *audio_state)
 
     Mix_HaltMusic();
     Mix_FreeMusic(audio_state->music);
-    free(audio_state);
+    MemoryFree(audio_state);
 }
 
 void

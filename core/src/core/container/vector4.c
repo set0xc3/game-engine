@@ -86,7 +86,7 @@ v4_dot(CVector4 left, CVector4 right)
            + (left.w * right.w);
 }
 
-b32
+b8
 v4_eq(CVector4 left, CVector4 right)
 {
     return left.x == right.x && left.y == right.y && left.z == right.z
