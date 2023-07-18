@@ -9,6 +9,7 @@
 #include "core/debug/debug.c"
 #include "core/debug/memory.c"
 #include "core/debug/profiler.c"
+#include "core/entry.c"
 #include "core/event/event.c"
 #include "core/input/input.c"
 #include "core/library/library.c"
@@ -22,12 +23,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_timer.h>
 
-typedef struct CCoreState
-{
-    CWindow *window;
-} CCoreState;
-
-global_variable CCoreState *core_state;
+#include "core/internal.h"
 
 void
 core_startup(void)

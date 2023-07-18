@@ -52,7 +52,7 @@ editor_shutdown(void)
 }
 
 void
-app_layer(CLayer *layer)
+layer_main(CLayer *layer)
 {
     layer->api.startup  = editor_startup;
     layer->api.update   = editor_update;

@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
 project(game)
 
-set(PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}/game.c)
+set(PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}/${PROJECT_NAME}.c)
 
 add_compile_definitions(LIBRARY_SHARED)
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES})
 
 target_include_directories(
     ${PROJECT_NAME}
-    PRIVATE ${PROJECT_SOURCE_DIR}/src ${CORE_SOURCE_DIR} ${ENGINE_SOURCE_DIR}
+    PRIVATE ${PROJECT_SOURCE_DIR}/src ${CORE_SOURCE_DIR}
 )
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")

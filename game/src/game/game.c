@@ -3,36 +3,20 @@
 API void
 startup(void)
 {
+    PROFILER_BEGIN(game_startup);
     log_info("Game: startup\n");
+    PROFILER_END(game_startup);
 }
 
 API void
 update(f32 dt)
 {
-    local_variable b8 first_init = true;
-    if (first_init)
+    local_variable b8 first_init = false;
+    if (first_init == false)
     {
-        first_init = false;
+        first_init = true;
         log_info("Game: update\n");
     }
-
-#if 0
-    if (input_key_up(KeyCode_Q))
-    {
-        CEvent event = { 0 };
-        event_fire(EventCode_AppQuit, event);
-        log_info("Game: keycode: q\n");
-    }
-
-    if (input_button_down(MouseButton_Left))
-    {
-        log_info("Game: mouse.button: left (down)\n");
-    }
-    if (input_button_up(MouseButton_Left))
-    {
-        log_info("Game: mouse.button: left (up)\n");
-    }
-#endif
 }
 
 API void

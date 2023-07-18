@@ -1,21 +1,21 @@
 cmake_minimum_required(VERSION 3.10)
 project(editor)
 
-set(PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}/editor.c)
+set(PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}/${PROJECT_NAME}.c)
 
-if(LIBRARY_SHARED STREQUAL "ON")
-    add_compile_definitions(LIBRARY_SHARED)
-    add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES})
-else()
-    add_library(${PROJECT_NAME} STATIC ${PROJECT_SOURCES})
-endif()
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
 target_include_directories(
     ${PROJECT_NAME}
-    PRIVATE ${PROJECT_SOURCE_DIR}/src ${CORE_SOURCE_DIR} ${ENGINE_SOURCE_DIR}
+    PRIVATE ${PROJECT_SOURCE_DIR}/src ${CORE_SOURCE_DIR}
 )
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
     target_link_libraries(${PROJECT_NAME} PRIVATE core)
 endif()
+
+add_custom_target(
+    run-${PROJECT_NAME}
+    COMMAND cd ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} && ./${PROJECT_NAME} ${ARGS}
+)
