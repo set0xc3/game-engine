@@ -84,3 +84,11 @@ _debug_memory_zero(void *memory, u64 size, const char *file_path, u64 line)
 
     // log_info("memory.zero: %s:%lu\n", file_path, line);
 }
+
+void
+_debug_memory_copy(void *dest, void *src, u64 size, const char *file_path,
+                   u64 line)
+{
+    memcpy(dest, src, size);
+    // log_info("memory.copy: %s:%lu\n", file_path, line);
+}

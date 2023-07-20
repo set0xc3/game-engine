@@ -1,7 +1,5 @@
 #include "core/core.h"
 
-#include "core/audio/audio.c"
-#include "core/container/hash.c"
 #include "core/container/string8.c"
 #include "core/container/vector2.c"
 #include "core/container/vector3.c"
@@ -18,6 +16,7 @@
 #include "core/memory/arena.c"
 #include "core/module/module.c"
 #include "core/scene/scene.c"
+#include "core/uuid/uuid.c"
 #include "core/window/window.c"
 
 #include <SDL2/SDL.h>
@@ -28,8 +27,6 @@
 void
 core_startup(void)
 {
-    debug_startup();
-
     core_state = MemoryAllocStruct(CCoreState);
     MemoryZeroStruct(core_state, CCoreState);
 
@@ -37,11 +34,6 @@ core_startup(void)
     {
         log_error("SDL could not initialize: %s\n", SDL_GetError());
     }
-
-    core_state->window = window_open("GameEngine", 0, 0, 1280, 720);
-
-    event_startup();
-    input_startup();
 }
 
 void
@@ -54,13 +46,7 @@ core_update(void)
 void
 core_shutdown(void)
 {
-    window_close(core_state->window);
-
-    event_shutdown();
-    input_shutdown();
-
     SDL_Quit();
-
     MemoryFree(core_state);
 }
 

@@ -1,3 +1,10 @@
 .cache/
 build/
 vendor/
+zig-cache/
+zig-out/
+*.json
+*.lib
+*.a
+*.dll
+*.so

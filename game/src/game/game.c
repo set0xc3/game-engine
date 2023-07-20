@@ -1,14 +1,17 @@
 #include <core/core.h>
 
-API void
+CEXPORT void
 startup(void)
 {
     PROFILER_BEGIN(game_startup);
     log_info("Game: startup\n");
     PROFILER_END(game_startup);
+
+    CEntity *entity = scene_entity_create();
+    scene_entity_destroy(entity);
 }
 
-API void
+CEXPORT void
 update(f32 dt)
 {
     local_variable b8 first_init = false;
@@ -19,7 +22,7 @@ update(f32 dt)
     }
 }
 
-API void
+CEXPORT void
 shutdown(void)
 {
     log_info("Game: shutdown\n");

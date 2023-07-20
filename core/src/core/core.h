@@ -45,45 +45,39 @@ typedef i64 b64;
 
 #ifdef __linux__
 #define PLATFORM_LINUX
-#elif __WIN32__
+#elif defined(__WIN32__)
 #define PLATFORM_WINDOWS
 #endif
 
 #ifdef PLATFORM_LINUX
 #define PLATFORM_LIB_EXT "so"
 #define PLATFORM_SLASH   '/'
-#elif PLATFORM_WINDOWS
+#elif defined(PLATFORM_WINDOWS)
 #define PLATFORM_LIB_EXT "dll"
 #define PLATFORM_SLASH   '\\'
 #endif
 
 #ifdef PLATFORM_LINUX
-#ifdef LIBRARY_SHARED
-#define API __attribute__((visibility("default")))
-#else
-#define API
-#endif
-#elif PLATFORM_WINDOWS
-#ifdef LIBRARY_SHARED
-#define API __declspec(dllexport)
-#else
-#define API __declspec(dllimport)
-#endif
+#define CEXPORT __attribute__((visibility("default")))
+#define CIMPORT
+#elif defined(PLATFORM_WINDOWS)
+#define CEXPORT __declspec(dllexport)
+#define CIMPORT __declspec(dllimport)
 #endif
 
 // Core Interface
 
-API void core_startup(void);
-API void core_update(void);
-API void core_shutdown(void);
-API b8   core_poll_event(void);
-API void core_sleep(u32 ms);
-API u64  core_perf_counter(void);
-API u64  core_perf_frequency(void);
+CEXPORT void core_startup(void);
+CEXPORT void core_update(void);
+CEXPORT void core_shutdown(void);
+CEXPORT b8   core_poll_event(void);
+CEXPORT void core_sleep(u32 ms);
+CEXPORT u64  core_perf_counter(void);
+CEXPORT u64  core_perf_frequency(void);
 
 // Container Interface
 
-API u64 hash_string_fnv1a64(const char *str);
+CEXPORT u64 hash_string_fnv1a64(const char *str);
 
 // CString8
 
@@ -93,8 +87,8 @@ typedef struct CString8
     u64 size;
 } CString8;
 
-API CString8 str8(const char *c);
-API b8       str8_eq(const CString8 left, const CString8 right);
+CEXPORT CString8 str8(const char *c);
+CEXPORT b8       str8_eq(const CString8 left, const CString8 right);
 
 #define str8_c(s) (const char *)s.str
 
@@ -125,21 +119,21 @@ typedef union CVector2
     f32 elements[2];
 } CVector2;
 
-API CVector2 v2(f32 x, f32 y);
-API CVector2 v2_add(CVector2 left, CVector2 right);
-API CVector2 v2_addf(CVector2 left, f32 right);
-API CVector2 v2_sub(CVector2 left, CVector2 right);
-API CVector2 v2_subf(CVector2 left, f32 right);
-API CVector2 v2_mul(CVector2 left, CVector2 right);
-API CVector2 v2_mulf(CVector2 left, f32 right);
-API CVector2 v2_div(CVector2 left, CVector2 right);
-API CVector2 v2_divf(CVector2 left, f32 right);
-API f32      v2_dot(CVector2 left, CVector2 right);
-API b8       v2_eq(CVector2 left, CVector2 right);
-API CVector2 v2_norm(CVector2 v);
-API f32      v2_sqrt_len(CVector2 v);
-API f32      v2_len(CVector2 v);
-API CVector2 v2_lerp(CVector2 left, CVector2 right, f32 time);
+CEXPORT CVector2 v2(f32 x, f32 y);
+CEXPORT CVector2 v2_add(CVector2 left, CVector2 right);
+CEXPORT CVector2 v2_addf(CVector2 left, f32 right);
+CEXPORT CVector2 v2_sub(CVector2 left, CVector2 right);
+CEXPORT CVector2 v2_subf(CVector2 left, f32 right);
+CEXPORT CVector2 v2_mul(CVector2 left, CVector2 right);
+CEXPORT CVector2 v2_mulf(CVector2 left, f32 right);
+CEXPORT CVector2 v2_div(CVector2 left, CVector2 right);
+CEXPORT CVector2 v2_divf(CVector2 left, f32 right);
+CEXPORT f32      v2_dot(CVector2 left, CVector2 right);
+CEXPORT b8       v2_eq(CVector2 left, CVector2 right);
+CEXPORT CVector2 v2_norm(CVector2 v);
+CEXPORT f32      v2_sqrt_len(CVector2 v);
+CEXPORT f32      v2_len(CVector2 v);
+CEXPORT CVector2 v2_lerp(CVector2 left, CVector2 right, f32 time);
 
 // CVector3
 
@@ -187,19 +181,19 @@ typedef union CVector3
     f32 elements[3];
 } CVector3;
 
-API CVector3 v3(f32 x, f32 y, f32 z);
-API CVector3 v3_add(CVector3 left, CVector3 right);
-API CVector3 v3_sub(CVector3 left, CVector3 right);
-API CVector3 v3_mul(CVector3 left, CVector3 right);
-API CVector3 v3_mulf(CVector3 left, f32 right);
-API CVector3 v3_div(CVector3 left, CVector3 right);
-API CVector3 v3_divf(CVector3 left, f32 right);
-API f32      v3_dot(CVector3 left, CVector3 right);
-API b8       v3_eq(CVector3 left, CVector3 right);
-API CVector3 v3_norm(CVector3 v);
-API f32      v3_sqrt_len(CVector3 v);
-API f32      v3_len(CVector3 v);
-API CVector3 v3_lerp(CVector3 left, CVector3 right, f32 time);
+CEXPORT CVector3 v3(f32 x, f32 y, f32 z);
+CEXPORT CVector3 v3_add(CVector3 left, CVector3 right);
+CEXPORT CVector3 v3_sub(CVector3 left, CVector3 right);
+CEXPORT CVector3 v3_mul(CVector3 left, CVector3 right);
+CEXPORT CVector3 v3_mulf(CVector3 left, f32 right);
+CEXPORT CVector3 v3_div(CVector3 left, CVector3 right);
+CEXPORT CVector3 v3_divf(CVector3 left, f32 right);
+CEXPORT f32      v3_dot(CVector3 left, CVector3 right);
+CEXPORT b8       v3_eq(CVector3 left, CVector3 right);
+CEXPORT CVector3 v3_norm(CVector3 v);
+CEXPORT f32      v3_sqrt_len(CVector3 v);
+CEXPORT f32      v3_len(CVector3 v);
+CEXPORT CVector3 v3_lerp(CVector3 left, CVector3 right, f32 time);
 
 // CVector4
 
@@ -269,59 +263,62 @@ typedef union CVector4
     f32 elements[4];
 } CVector4;
 
-API CVector4 v4(f32 x, f32 y, f32 z, f32 w);
-API CVector4 v4_add(CVector4 left, CVector4 right);
-API CVector4 v4_sub(CVector4 left, CVector4 right);
-API CVector4 v4_mul(CVector4 left, CVector4 right);
-API CVector4 v4_mulf(CVector4 left, f32 right);
-API CVector4 v4_div(CVector4 left, CVector4 right);
-API CVector4 v4_divf(CVector4 left, f32 right);
-API f32      v4_dot(CVector4 left, CVector4 right);
-API b8       v4_eq(CVector4 left, CVector4 right);
-API CVector4 v4_norm(CVector4 v);
-API f32      v4_sqrt_len(CVector4 v);
-API f32      v4_len(CVector4 v);
-API CVector4 v4_lerp(CVector4 left, CVector4 right, f32 time);
+CEXPORT CVector4 v4(f32 x, f32 y, f32 z, f32 w);
+CEXPORT CVector4 v4_add(CVector4 left, CVector4 right);
+CEXPORT CVector4 v4_sub(CVector4 left, CVector4 right);
+CEXPORT CVector4 v4_mul(CVector4 left, CVector4 right);
+CEXPORT CVector4 v4_mulf(CVector4 left, f32 right);
+CEXPORT CVector4 v4_div(CVector4 left, CVector4 right);
+CEXPORT CVector4 v4_divf(CVector4 left, f32 right);
+CEXPORT f32      v4_dot(CVector4 left, CVector4 right);
+CEXPORT b8       v4_eq(CVector4 left, CVector4 right);
+CEXPORT CVector4 v4_norm(CVector4 v);
+CEXPORT f32      v4_sqrt_len(CVector4 v);
+CEXPORT f32      v4_len(CVector4 v);
+CEXPORT CVector4 v4_lerp(CVector4 left, CVector4 right, f32 time);
 
 // Asset Interface
 
 typedef struct CImage CImage;
 typedef struct CAsset CAsset;
 
-API void    asset_init(void);
-API void    asset_destroy(void);
-API void   *asset_file_rw_data_load(const char *file_path);
-API CImage *asset_image_load(const char *file_path);
-API void    asset_image_unload(CImage *image);
-API void    asset_image_size_get(CImage *image, i16 *width, i16 *height);
+CEXPORT void    asset_init(void);
+CEXPORT void    asset_destroy(void);
+CEXPORT void   *asset_file_rw_data_load(const char *file_path);
+CEXPORT CImage *asset_image_load(const char *file_path);
+CEXPORT void    asset_image_unload(CImage *image);
+CEXPORT void    asset_image_size_get(CImage *image, i16 *width, i16 *height);
 
 // Audio Interface
 
 typedef struct CAudio CAudio;
 
-API void    audio_init(void);
-API CAudio *audio_load(const char *file_path);
-API void    audio_unload(CAudio *audio_state);
-API void    audio_play(CAudio *audio_state, bool loop);
-API void    audio_stop(CAudio *audio_state);
+CEXPORT void    audio_init(void);
+CEXPORT CAudio *audio_load(const char *file_path);
+CEXPORT void    audio_unload(CAudio *audio_state);
+CEXPORT void    audio_play(CAudio *audio_state, bool loop);
+CEXPORT void    audio_stop(CAudio *audio_state);
 
 // Debug Interface
 
 typedef struct CDebugState CDebugState;
 
-API void debug_startup(void);
-API void debug_shutdown(void);
-API void debug_update(void);
+CEXPORT void debug_startup(void);
+CEXPORT void debug_shutdown(void);
+CEXPORT void debug_update(void);
 
-API void debug_memory_handle(void);
+CEXPORT void debug_memory_handle(void);
 
-API void *_debug_memory_alloc(u64 size, const char *file_path, u64 line);
-API void  _debug_memory_free(void *memory, const char *file_path, u64 line);
-API void  _debug_memory_zero(void *memory, u64 size, const char *file_path,
-                             u64 line);
+CEXPORT void *_debug_memory_alloc(u64 size, const char *file_path, u64 line);
+CEXPORT void _debug_memory_free(void *memory, const char *file_path, u64 line);
+CEXPORT void _debug_memory_zero(void *memory, u64 size, const char *file_path,
+                                u64 line);
+CEXPORT void _debug_memory_copy(void *dest, void *src, u64 size,
+                                const char *file_path, u64 line);
 
-API void *_debug_profiler_timed_block_begin(const char *func_name);
-API void  _debug_profiler_timed_block_end(void *counter_ptr, u64 cycle_count);
+CEXPORT void *_debug_profiler_timed_block_begin(const char *func_name);
+CEXPORT void  _debug_profiler_timed_block_end(void *counter_ptr,
+                                              u64   cycle_count);
 
 #define PROFILER_BEGIN(NAME)                                                  \
     void *current_counter_##NAME = _debug_profiler_timed_block_begin(#NAME);  \
@@ -334,17 +331,18 @@ API void  _debug_profiler_timed_block_end(void *counter_ptr, u64 cycle_count);
 
 // Entity Interface
 
-typedef u64 CEntityID;
+typedef char *CEntityID;
 
 typedef enum CEntityFlags
 {
-    Entity_Active     = 1 << 0,
-    Entity_Renderable = 1 << 1,
+    EntityFlag_Active     = 1 << 0,
+    EntityFlag_Renderable = 1 << 1,
+    EntityFlag_Everything = 0xFFFFFFFF,
 } CEntityFlags;
 
 typedef struct CEntity
 {
-    CEntityID    id;
+    CEntityID    uuid;
     CEntityFlags flags;
     b8           enabled;
 
@@ -363,27 +361,30 @@ typedef struct CSceneState
     b8    edited;
     b8    dirtied;
 
-    CEntityID entities_selected[SCENE_ENTITIES_MAX];
-    u64       entities_selected_count;
-    CEntity   entities[SCENE_ENTITIES_MAX];
-    u64       entities_count;
+    CEntityID *entities_selected;
+    u64        entities_selected_count;
+    CEntity   *entities;
+    u64        entities_count;
 } CSceneState;
 
-API void scene_startup(void);
-API void scene_update(f32 dt);
-API void scene_shutdown(void);
+CEXPORT void scene_startup(void);
+CEXPORT void scene_update(f32 dt);
+CEXPORT void scene_shutdown(void);
 
-API void scene_entity_add(CEntity *entity);
-API void scene_entity_remove(CEntity *entity);
+CEXPORT CEntity *scene_entity_create(void);
+CEXPORT void     scene_entity_destroy(CEntity *entity);
+
+// UUID Interface
+CEXPORT char *uuid_gen(void); // NOTE: allocates memory!
 
 // Window Interface
 
 typedef struct CWindow CWindow;
 
-API CWindow *window_open(const char *title, i32 xpos, i32 ypos, i32 width,
-                         i32 height);
-API void     window_close(CWindow *window);
-API b8       window_poll_events(void);
+CEXPORT CWindow *window_open(const char *title, i32 xpos, i32 ypos, i32 width,
+                             i32 height);
+CEXPORT void     window_close(CWindow *window);
+CEXPORT b8       window_poll_events(void);
 
 // Event Interface
 
@@ -427,11 +428,11 @@ typedef struct CEvent
 
 typedef b8 (*event_on_listener)(u32 code, CEvent event);
 
-API b8 event_startup(void);
-API b8 event_shutdown(void);
-API b8 event_register(u32 code, event_on_listener on_listener);
-API b8 event_unregister(u32 code, event_on_listener on_listener);
-API b8 event_fire(u32 code, CEvent event);
+CEXPORT b8 event_startup(void);
+CEXPORT b8 event_shutdown(void);
+CEXPORT b8 event_register(u32 code, event_on_listener on_listener);
+CEXPORT b8 event_unregister(u32 code, event_on_listener on_listener);
+CEXPORT b8 event_fire(u32 code, CEvent event);
 
 // Input Interface
 
@@ -476,23 +477,23 @@ typedef struct CInputState
     CMouseState mouse_previous;
 } CInputState;
 
-API void input_startup(void);
-API void input_shutdown(void);
+CEXPORT void input_startup(void);
+CEXPORT void input_shutdown(void);
 
-API void input_button_process(u32 button, b8 pressed);
-API void input_key_process(u32 key, b8 pressed);
-API void input_mouse_motion_process(i32 x, i32 y);
-API void input_mouse_scroll_process(i32 delta);
+CEXPORT void input_button_process(u32 button, b8 pressed);
+CEXPORT void input_key_process(u32 key, b8 pressed);
+CEXPORT void input_mouse_motion_process(i32 x, i32 y);
+CEXPORT void input_mouse_scroll_process(i32 delta);
 
-API void input_update(void);
-API b8   input_button_pressed(u32 button);
-API b8   input_button_down(u32 button);
-API b8   input_button_up(u32 button);
-API b8   input_key_pressed(u32 key);
-API b8   input_key_down(u32 key);
-API b8   input_key_up(u32 key);
-API void input_mouse_position_get(i32 *x, i32 *y);
-API void input_mouse_wheel_get(i32 *delta);
+CEXPORT void input_update(void);
+CEXPORT b8   input_button_pressed(u32 button);
+CEXPORT b8   input_button_down(u32 button);
+CEXPORT b8   input_button_up(u32 button);
+CEXPORT b8   input_key_pressed(u32 key);
+CEXPORT b8   input_key_down(u32 key);
+CEXPORT b8   input_key_up(u32 key);
+CEXPORT void input_mouse_position_get(i32 *x, i32 *y);
+CEXPORT void input_mouse_wheel_get(i32 *delta);
 
 // Module Interface
 
@@ -503,9 +504,9 @@ typedef struct CModuleAPI
     void (*shutdown)(void);
 } CModuleAPI;
 
-API void module_startup_stub(void);
-API void module_update_stub(f32 dt);
-API void module_shutdown_stub(void);
+CEXPORT void module_startup_stub(void);
+CEXPORT void module_update_stub(f32 dt);
+CEXPORT void module_shutdown_stub(void);
 
 // Layer Interface
 
@@ -514,7 +515,7 @@ typedef struct CLayer
     CModuleAPI api;
 } CLayer;
 
-API void layer_main(CLayer *layer);
+CEXPORT void layer_main(CLayer *layer);
 
 // Library Interface
 
@@ -524,16 +525,16 @@ typedef struct CLibrary
     CModuleAPI api;
 } CLibrary;
 
-API CLibrary *library_load(const char *path);
-API void      library_unload(CLibrary *library);
-API void     *library_load_function(CLibrary *library, const char *name);
+CEXPORT CLibrary *library_load(const char *path);
+CEXPORT void      library_unload(CLibrary *library);
+CEXPORT void     *library_load_function(CLibrary *library, const char *name);
 
 // Logger Interface
 
-API void log_info(const char *format, ...);
-API void log_debug(const char *format, ...);
-API void log_warning(const char *format, ...);
-API void log_error(const char *format, ...);
+CEXPORT void log_info(const char *format, ...);
+CEXPORT void log_debug(const char *format, ...);
+CEXPORT void log_warning(const char *format, ...);
+CEXPORT void log_error(const char *format, ...);
 
 // Math Interface
 
@@ -552,47 +553,51 @@ API void log_error(const char *format, ...);
 #define COLOR_WHITE       v4(1.0f, 1.0f, 1.0f, 1.0f)
 #define COLOR_BLACK       v4(0.0f, 0.0f, 0.0f, 1.0f)
 
-API f32 m_radiansf(f32 degree);
-API f32 m_degreesf(f32 radian);
-API f64 m_radians(f64 degree);
-API f64 m_degrees(f64 radian);
+CEXPORT f32 m_radiansf(f32 degree);
+CEXPORT f32 m_degreesf(f32 radian);
+CEXPORT f64 m_radians(f64 degree);
+CEXPORT f64 m_degrees(f64 radian);
 
 // Memory Interface
 
 #ifndef NDEBUG
 #define MemoryAlloc(type, size)                                               \
     (type *)_debug_memory_alloc(size * sizeof(type), __FILE__, __LINE__)
-#define MemoryAllocArray(type, size) MemoryAlloc(type, size)
-#define MemoryAllocStruct(type)      MemoryAlloc(type, 1)
-#define MemoryFree(memory)           _debug_memory_free(memory, __FILE__, __LINE__)
+#define MemoryFree(memory) _debug_memory_free(memory, __FILE__, __LINE__)
 #define MemoryZero(memory, type, size)                                        \
     _debug_memory_zero(memory, size * sizeof(type), __FILE__, __LINE__)
-#define MemoryZeroArray(memory, type, size) MemoryZero(memory, type, size)
-#define MemoryZeroStruct(memory, type)      MemoryZero(memory, type, 1)
+#define MemoryCopy(dest, src, type, size)                                     \
+    _debug_memory_copy(dest, src, size * sizeof(type), __FILE__, __LINE__)
 #else
-#define MemoryAlloc(type, size)             (type *)malloc(size * sizeof(type))
+#define MemoryAlloc(type, size)        (type *)malloc(size * sizeof(type))
+#define MemoryFree(memory)             free(memory)
+#define MemoryZero(memory, type, size) memset(memory, 0, size * sizeof(type))
+#define MemoryCopy(dest, src, type, size)                                     \
+    memcpy(dest, src, size * sizeof(type))
+#endif
+
 #define MemoryAllocArray(type, size)        MemoryAlloc(type, size)
 #define MemoryAllocStruct(type)             MemoryAlloc(type, 1)
-#define MemoryFree(memory)                  free(memory)
-#define MemoryZero(memory, type, size)      memset(memory, 0, size * sizeof(type))
 #define MemoryZeroArray(memory, type, size) MemoryZero(memory, type, size)
 #define MemoryZeroStruct(memory, type)      MemoryZero(memory, type, 1)
-#endif
+#define MemoryCopyArray(dest, src, type, size)                                \
+    MemoryCopy(dest, src, type, size)
+#define MemoryCopyStruct(dest, src, type) MemoryCopy(dest, src, type, 1)
 
 typedef struct CMemoryArena     CMemoryArena;
 typedef struct CMemoryArenaTemp CMemoryArenaTemp;
 
-API CMemoryArena *arena_create(u64 size);
-API void          arena_destroy(CMemoryArena *arena);
-API void         *arena_push(CMemoryArena *arena, u64 size);
-API void         *arena_push_zero(CMemoryArena *arena, u64 size);
-API void         *arena_pop(CMemoryArena *arena, u64 size);
-API void          arena_clear(CMemoryArena *arena);
-API u64           arena_offset_get(CMemoryArena *arena);
+CEXPORT CMemoryArena *arena_create(u64 size);
+CEXPORT void          arena_destroy(CMemoryArena *arena);
+CEXPORT void         *arena_push(CMemoryArena *arena, u64 size);
+CEXPORT void         *arena_push_zero(CMemoryArena *arena, u64 size);
+CEXPORT void         *arena_pop(CMemoryArena *arena, u64 size);
+CEXPORT void          arena_clear(CMemoryArena *arena);
+CEXPORT u64           arena_offset_get(CMemoryArena *arena);
 
-API CMemoryArenaTemp arena_temp_begin(CMemoryArena *arena);
-API void             arena_temp_end(CMemoryArenaTemp temp);
-API CMemoryArenaTemp arena_temp_scratch_get(CMemoryArena *arena);
+CEXPORT CMemoryArenaTemp arena_temp_begin(CMemoryArena *arena);
+CEXPORT void             arena_temp_end(CMemoryArenaTemp temp);
+CEXPORT CMemoryArenaTemp arena_temp_scratch_get(CMemoryArena *arena);
 
 #define PushArray(arena, type, count)                                         \
     (type *)arena_push(arena, count * sizeof(type))

@@ -66,7 +66,7 @@ arena_pop(CMemoryArena *arena, u64 size)
     }
 
     arena->pos -= size;
-    u8 *pos = (u8 *)arena->pos - size;
+    u8 *pos = (u8 *)arena->data + arena->pos - size;
     return pos;
 }
 

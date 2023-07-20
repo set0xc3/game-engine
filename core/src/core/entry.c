@@ -37,6 +37,9 @@ main(int argc, char *argv[])
 {
     debug_startup();
     core_startup();
+    event_startup();
+    input_startup();
+    scene_startup();
 
     core_state->layer.api.startup  = module_startup_stub;
     core_state->layer.api.update   = module_update_stub;
@@ -55,6 +58,7 @@ main(int argc, char *argv[])
     core_state->game      = library;
     core_state->game->api.startup();
 
+    core_state->window = window_open("GameEngine", 0, 0, 1280, 720);
     event_register(EventCode_Everything, core_on_event);
 
     const f64 fps_max        = 60.0;
@@ -94,8 +98,12 @@ main(int argc, char *argv[])
         core_sleep((u64)period_max);
     }
 
+    window_close(core_state->window);
     core_state->game->api.shutdown();
     core_state->layer.api.shutdown();
+    event_shutdown();
+    input_shutdown();
+    scene_shutdown();
     core_shutdown();
     debug_shutdown();
 

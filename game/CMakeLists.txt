@@ -12,6 +12,7 @@ target_include_directories(
 )
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    target_link_libraries(${PROJECT_NAME} PRIVATE core)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
     target_link_libraries(${PROJECT_NAME} PRIVATE core)
 endif()
