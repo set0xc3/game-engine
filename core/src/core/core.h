@@ -67,6 +67,8 @@ typedef i64 b64;
 
 // Core Interface
 
+typedef struct CCoreState CCoreState;
+
 CEXPORT void core_startup(void);
 CEXPORT void core_update(void);
 CEXPORT void core_shutdown(void);
@@ -512,6 +514,7 @@ CEXPORT void module_shutdown_stub(void);
 
 typedef struct CLayer
 {
+    b8         is_valid;
     CModuleAPI api;
 } CLayer;
 
@@ -521,13 +524,14 @@ CEXPORT void layer_main(CLayer *layer);
 
 typedef struct CLibrary
 {
+    b8         is_valid;
     void      *handle;
     CModuleAPI api;
 } CLibrary;
 
-CEXPORT CLibrary *library_load(const char *path);
-CEXPORT void      library_unload(CLibrary *library);
-CEXPORT void     *library_load_function(CLibrary *library, const char *name);
+CEXPORT CLibrary library_load(const char *path);
+CEXPORT void     library_unload(CLibrary *library);
+CEXPORT void    *library_load_function(CLibrary *library, const char *name);
 
 // Logger Interface
 
@@ -608,5 +612,14 @@ CEXPORT CMemoryArenaTemp arena_temp_scratch_get(CMemoryArena *arena);
 #define PopArray(arena, type, count)                                          \
     (type *)arena_pop(arena, count * sizeof(type))
 #define PopStruct(arena, type) PopArray(arena, 1)
+
+// Module Interface
+
+typedef struct CMouduleMemory
+{
+    b8            is_initialized;
+    CMemoryArena *permanent_storage;
+    CMemoryArena *transient_storage;
+} CMouduleMemory;
 
 #endif // CORE_H

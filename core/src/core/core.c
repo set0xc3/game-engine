@@ -7,7 +7,6 @@
 #include "core/debug/debug.c"
 #include "core/debug/memory.c"
 #include "core/debug/profiler.c"
-#include "core/entry.c"
 #include "core/event/event.c"
 #include "core/input/input.c"
 #include "core/library/library.c"
@@ -22,14 +21,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_timer.h>
 
-#include "core/internal.h"
-
 void
 core_startup(void)
 {
-    core_state = MemoryAllocStruct(CCoreState);
-    MemoryZeroStruct(core_state, CCoreState);
-
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS) < 0)
     {
         log_error("SDL could not initialize: %s\n", SDL_GetError());
@@ -47,7 +41,6 @@ void
 core_shutdown(void)
 {
     SDL_Quit();
-    MemoryFree(core_state);
 }
 
 b8

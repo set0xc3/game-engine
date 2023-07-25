@@ -2,11 +2,10 @@
 
 #include <SDL2/SDL.h>
 
-CLibrary *
+CLibrary
 library_load(const char *path)
 {
-    CLibrary *result = MemoryAllocStruct(CLibrary);
-    MemoryZeroStruct(result, CLibrary);
+    CLibrary result = { 0 };
 
     char *dot      = ".";
     u64   dot_size = strlen(dot);
@@ -18,11 +17,13 @@ library_load(const char *path)
     strncat((char *)path_ext.str, dot, path_ext.size);
     strncat((char *)path_ext.str, PLATFORM_LIB_EXT, path_ext.size);
 
-    result->handle = SDL_LoadObject((const char *)path_ext.str);
-    if (result->handle == NULL)
+    result.handle = SDL_LoadObject((const char *)path_ext.str);
+    if (result.handle == NULL)
     {
         log_error("[SDL] %s\n", SDL_GetError());
     }
+
+    result.is_valid = true;
 
     return result;
 }

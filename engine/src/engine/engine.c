@@ -2,7 +2,10 @@
 
 #include "core/internal.h"
 
-global_variable b8 is_running = true;
+#include <SDL2/SDL.h>
+
+global_variable b8          is_running = true;
+global_variable CCoreState *core_state;
 
 internal b8
 core_on_event(u32 code, CEvent event)
@@ -35,28 +38,60 @@ core_on_event(u32 code, CEvent event)
 int
 main(int argc, char *argv[])
 {
+    core_state = MemoryAllocStruct(CCoreState);
+    MemoryZeroStruct(core_state, CCoreState);
+
     debug_startup();
     core_startup();
     event_startup();
     input_startup();
     scene_startup();
 
+    // NOTE: Load layer and checking
     core_state->layer.api.startup  = module_startup_stub;
     core_state->layer.api.update   = module_update_stub;
     core_state->layer.api.shutdown = module_shutdown_stub;
-    layer_main(&core_state->layer);
+    // layer_main(&core_state->layer);
+    if (core_state->layer.is_valid)
+    {
+        if (core_state->layer.api.startup == NULL
+            || core_state->layer.api.update == NULL
+            || core_state->layer.api.shutdown == NULL)
+        {
+            core_state->layer.is_valid     = false;
+            core_state->layer.api.startup  = module_startup_stub;
+            core_state->layer.api.update   = module_update_stub;
+            core_state->layer.api.shutdown = module_shutdown_stub;
+        }
+    }
+
+    // NOTE: Load game library and checking
+    core_state->game_dll.api.startup  = module_startup_stub;
+    core_state->game_dll.api.update   = module_update_stub;
+    core_state->game_dll.api.shutdown = module_shutdown_stub;
+    // core_state->game_dll              = library_load("./libgame");
+    if (core_state->game_dll.is_valid)
+    {
+        core_state->game_dll.api.startup
+            = library_load_function(&core_state->game_dll, "startup");
+        core_state->game_dll.api.update
+            = library_load_function(&core_state->game_dll, "update");
+        core_state->game_dll.api.shutdown
+            = library_load_function(&core_state->game_dll, "shutdown");
+
+        if (core_state->game_dll.api.startup == NULL
+            || core_state->game_dll.api.update == NULL
+            || core_state->game_dll.api.shutdown == NULL)
+        {
+            core_state->game_dll.is_valid     = false;
+            core_state->game_dll.api.startup  = module_startup_stub;
+            core_state->game_dll.api.update   = module_update_stub;
+            core_state->game_dll.api.shutdown = module_shutdown_stub;
+        }
+    }
+
     core_state->layer.api.startup();
-
-    CLibrary *library     = library_load("./libgame");
-    library->api.startup  = module_startup_stub;
-    library->api.update   = module_update_stub;
-    library->api.shutdown = module_shutdown_stub;
-
-    library->api.startup  = library_load_function(library, "startup");
-    library->api.update   = library_load_function(library, "update");
-    library->api.shutdown = library_load_function(library, "shutdown");
-    core_state->game      = library;
-    core_state->game->api.startup();
+    core_state->game_dll.api.startup();
 
     core_state->window = window_open("GameEngine", 0, 0, 1280, 720);
     event_register(EventCode_Everything, core_on_event);
@@ -86,7 +121,7 @@ main(int argc, char *argv[])
 
             core_update();
             core_state->layer.api.update(dt);
-            core_state->game->api.update(dt);
+            core_state->game_dll.api.update(dt);
 
             end_counter = begin_counter;
             time += dt;
@@ -99,7 +134,7 @@ main(int argc, char *argv[])
     }
 
     window_close(core_state->window);
-    core_state->game->api.shutdown();
+    core_state->game_dll.api.shutdown();
     core_state->layer.api.shutdown();
     event_shutdown();
     input_shutdown();

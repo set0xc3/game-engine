@@ -1,9 +1,16 @@
 #include <core/core.h>
 
+typedef struct GameState
+{
+} GameState;
+
+global_variable GameState game_state;
+
 CEXPORT void
 startup(void)
 {
     PROFILER_BEGIN(game_startup);
+
     log_info("Game: startup\n");
     PROFILER_END(game_startup);
 
@@ -26,4 +33,10 @@ CEXPORT void
 shutdown(void)
 {
     log_info("Game: shutdown\n");
+}
+
+// TODO: remove this
+void
+layer_main(CLayer *layer)
+{
 }

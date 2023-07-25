@@ -48,6 +48,8 @@ scene_entity_destroy(CEntity *entity)
 {
     scene_state->entities_count--;
     MemoryFree(entity->uuid);
-    MemoryCopyStruct(entity, &scene_state->entities_count - 1, CEntity);
+    MemoryCopyStruct(entity,
+                     scene_state->entities + scene_state->entities_count - 1,
+                     CEntity);
     // MemoryZeroStruct(entity, CEntity);
 }

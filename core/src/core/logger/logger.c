@@ -31,10 +31,10 @@ log_message(CLoggerType type, const char *format, va_list args)
 
     va_list args_copy;
     va_copy(args_copy, args);
-    int32_t buffer_size = vsnprintf(NULL, 0, format, args_copy);
+    u64 buffer_size = vsnprintf(NULL, 0, format, args_copy);
     va_end(args_copy);
 
-    buffer = alloca(buffer_size + 1);
+    buffer = MemoryAllocArray(char, buffer_size + 1);
     vsnprintf(buffer, buffer_size + 1, format, args);
 
     const u32 padding = prefix_width - (u32)strlen(prefix);

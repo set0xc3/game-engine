@@ -3,14 +3,12 @@
 
 #include "core/core.h"
 
-typedef struct CCoreState
+struct CCoreState
 {
-    CLayer    layer;
-    CWindow  *window;
-    CLibrary *game;
-
-} CCoreState;
-
-global_variable CCoreState *core_state;
+    CLayer       layer;
+    CWindow     *window;
+    CLibrary     game_dll;
+    CSceneState *scene_state;
+};
 
 #endif // CORE_INTERNAL_H
